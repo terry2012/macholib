@@ -60,3 +60,18 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+# hg
+.hg/
+.hgignore
+.hgtags
+
+# PyCharm
+.idea/.hgignore
+.hgtags
+
+# PyCharm
+.idea/
+
+# Mac OS X
+.DS_Store
