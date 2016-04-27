@@ -15,191 +15,226 @@ import time
 from macholib.ptypes import *
 
 
-_CPU_ARCH_ABI64 = 0x01000000
+# CPU types, refer:
+#   - http://www.opensource.apple.com/source/cctools/cctools-862/include/mach/machine.h
+#   - /usr/include/mach/machine.h
+#   - http://opensource.apple.com/source/cctools/cctools-862/libmacho/arch.c
+#   - man 3 arch
 
-CPU_TYPE_NAMES = {
-    -1:     'ANY',
-    1:      'VAX',
-    6:      'MC680x0',
-    7:      'i386',
-    _CPU_ARCH_ABI64 | 7:    'x86_64',
-    8:      'MIPS',
-    10:     'MC98000',
-    11:     'HPPA',
-    12:     'ARM',
-    _CPU_ARCH_ABI64 | 12:     'ARM64',
-    13:     'MC88000',
-    14:     'SPARC',
-    15:     'i860',
-    16:     'Alpha',
-    18:     'PowerPC',
-    _CPU_ARCH_ABI64 | 18:    'PowerPC64',
+CPU_ARCH_ABI64 = 0x1000000
+
+CPU_TYPE_ANY = -1
+CPU_TYPE_VAX = 1
+CPU_TYPE_ROMP = 2
+CPU_TYPE_NS32032 = 4
+CPU_TYPE_NS32332 = 5
+CPU_TYPE_MC680x0 = 6
+CPU_TYPE_I386 = 7
+CPU_TYPE_X86_64 = CPU_TYPE_I386 | CPU_ARCH_ABI64
+CPU_TYPE_MIPS = 8
+CPU_TYPE_NS32532 = 9
+CPU_TYPE_HPPA = 11
+CPU_TYPE_ARM = 12
+CPU_TYPE_ARM64 = CPU_TYPE_ARM | CPU_ARCH_ABI64
+CPU_TYPE_MC88000 = 13
+CPU_TYPE_SPARC = 14
+CPU_TYPE_I860 = 15  # big-endian
+CPU_TYPE_I860_LITTLE = 16  # little-endian
+CPU_TYPE_RS6000 = 17
+# CPU_TYPE_MC98000 = 18
+CPU_TYPE_POWERPC = 18
+CPU_TYPE_POWERPC64 = CPU_TYPE_POWERPC | CPU_ARCH_ABI64
+CPU_TYPE_VEO = 255
+
+CPU_SUBTYPE_LIB64 = 0x80000000
+CPU_SUBTYPE_MULTIPLE = -1
+
+# CPU_TYPE_VAX
+CPU_SUBTYPE_VAX_ALL = 0
+CPU_SUBTYPE_VAX780 = 1
+CPU_SUBTYPE_VAX785 = 2
+CPU_SUBTYPE_VAX750 = 3
+CPU_SUBTYPE_VAX730 = 4
+CPU_SUBTYPE_UVAXI = 5
+CPU_SUBTYPE_UVAXII = 6
+CPU_SUBTYPE_VAX8200 = 7
+CPU_SUBTYPE_VAX8500 = 8
+CPU_SUBTYPE_VAX8600 = 9
+CPU_SUBTYPE_VAX8650 = 10
+CPU_SUBTYPE_VAX8800 = 11
+CPU_SUBTYPE_UVAXIII = 12
+
+# CPU_TYPE_ROMP
+CPU_SUBTYPE_RT_ALL = 0
+CPU_SUBTYPE_RT_PC = 1
+CPU_SUBTYPE_RT_APC = 2
+CPU_SUBTYPE_RT_135 = 3
+
+# CPU_TYPE_NS32032, CPU_TYPE_NS32332, CPU_TYPE_NS32532
+CPU_SUBTYPE_MMAX_ALL = 0
+CPU_SUBTYPE_MMAX_DPC = 1
+CPU_SUBTYPE_SQT = 2
+CPU_SUBTYPE_MMAX_APC_FPU = 3
+CPU_SUBTYPE_MMAX_APC_FPA = 4
+CPU_SUBTYPE_MMAX_XPC = 5
+
+# CPU_TYPE_I386
+CPU_SUBTYPE_I386_ALL = 3
+CPU_SUBTYPE_386 = 3
+CPU_SUBTYPE_486 = 4
+CPU_SUBTYPE_486SX = 4 + 128
+CPU_SUBTYPE_586 = 5
+# CPU_SUBTYPE_PENT = 5 + (0 << 4)
+CPU_SUBTYPE_PENTPRO = 6 + (1 << 4)
+CPU_SUBTYPE_PENTII_M3 = 6 + (3 << 4)
+CPU_SUBTYPE_PENTII_M5 = 6 + (5 << 4)
+CPU_SUBTYPE_PENTIUM_4 = 10 + (0 << 4)
+CPU_SUBTYPE_INTEL_FAMILY_MAX = 15
+CPU_SUBTYPE_INTEL_MODEL_ALL = 0
+
+# CPU_TYPE_X86_64
+CPU_SUBTYPE_X86_64_ALL = CPU_SUBTYPE_I386_ALL
+CPU_SUBTYPE_X86_64_H = 8
+
+# CPU_TYPE_MIPS
+CPU_SUBTYPE_MIPS_ALL = 0
+CPU_SUBTYPE_MIPS_R2300 = 1
+CPU_SUBTYPE_MIPS_R2600 = 2
+CPU_SUBTYPE_MIPS_R2800 = 3
+CPU_SUBTYPE_MIPS_R2000a = 4
+
+# CPU_TYPE_MC680x0
+CPU_SUBTYPE_MC680x0_ALL = 1
+CPU_SUBTYPE_MC68030 = 1
+CPU_SUBTYPE_MC68040 = 2
+CPU_SUBTYPE_MC68030_ONLY = 3
+
+# CPU_TYPE_HPPA
+CPU_SUBTYPE_HPPA_ALL = 0
+CPU_SUBTYPE_HPPA_7100 = 0
+CPU_SUBTYPE_HPPA_7100LC = 1
+
+# CPU_TYPE_ARM
+CPU_SUBTYPE_ARM_ALL = 0
+CPU_SUBTYPE_ARM_A500_ARCH = 1
+CPU_SUBTYPE_ARM_A500 = 2
+CPU_SUBTYPE_ARM_A440 = 3
+CPU_SUBTYPE_ARM_M4 = 4
+CPU_SUBTYPE_ARM_V4T = 5
+CPU_SUBTYPE_ARM_V6 = 6
+CPU_SUBTYPE_ARM_V5TEJ = 7
+CPU_SUBTYPE_ARM_XSCALE = 8
+CPU_SUBTYPE_ARM_V7 = 9
+CPU_SUBTYPE_ARM_V7F = 10  # Cortex A9
+CPU_SUBTYPE_ARM_V7S = 11  # Swift
+CPU_SUBTYPE_ARM_V7K = 12
+CPU_SUBTYPE_ARM_V8 = 13
+CPU_SUBTYPE_ARM_V6M = 14
+CPU_SUBTYPE_ARM_V7M = 15
+CPU_SUBTYPE_ARM_V7EM = 16
+
+# CPU_TYPE_ARM64
+CPU_SUBTYPE_ARM64_ALL = 0
+CPU_SUBTYPE_ARM64_V8 = 1
+
+# CPU_TYPE_MC88000
+CPU_SUBTYPE_MC88000_ALL = 0
+CPU_SUBTYPE_MMAX_JPC = 1
+CPU_SUBTYPE_MC88100 = 1
+CPU_SUBTYPE_MC88110 = 2
+
+# CPU_TYPE_SPARC
+CPU_SUBTYPE_SPARC_ALL = 0
+
+# CPU_TYPE_I860
+CPU_SUBTYPE_I860_ALL = 0
+CPU_SUBTYPE_I860_860 = 1
+
+# CPU_TYPE_I860_LITTLE
+CPU_SUBTYPE_I860_LITTLE_ALL = 0
+CPU_SUBTYPE_I860_LITTLE = 1
+
+# CPU_TYPE_RS6000
+CPU_SUBTYPE_RS6000_ALL = 0
+CPU_SUBTYPE_RS6000 = 1
+
+# CPU_TYPE_POWERPC, CPU_TYPE_POWERPC64
+CPU_SUBTYPE_POWERPC_ALL = 0
+CPU_SUBTYPE_POWERPC_601 = 1
+CPU_SUBTYPE_POWERPC_602 = 2
+CPU_SUBTYPE_POWERPC_603 = 3
+CPU_SUBTYPE_POWERPC_603E = 4
+CPU_SUBTYPE_POWERPC_603EV = 5
+CPU_SUBTYPE_POWERPC_604 = 6
+CPU_SUBTYPE_POWERPC_604E = 7
+CPU_SUBTYPE_POWERPC_620 = 8
+CPU_SUBTYPE_POWERPC_750 = 9
+CPU_SUBTYPE_POWERPC_7400 = 10
+CPU_SUBTYPE_POWERPC_7450 = 11
+CPU_SUBTYPE_POWERPC_970 = 100
+
+# CPU_TYPE_VEO
+CPU_SUBTYPE_VEO_1 = 1
+CPU_SUBTYPE_VEO_2 = 2
+CPU_SUBTYPE_VEO_3 = 3
+CPU_SUBTYPE_VEO_4 = 4
+CPU_SUBTYPE_VEO_ALL = CPU_SUBTYPE_VEO_2
+
+_CPU_TYPE_TABLE = {
+    (CPU_TYPE_I386, CPU_SUBTYPE_I386_ALL): ("i386", "Intel 80x86"),
+    (CPU_TYPE_I386, CPU_SUBTYPE_486): ("i486", "Intel 80486"),
+    (CPU_TYPE_I386, CPU_SUBTYPE_486SX): ("i486SX", "Intel 80486SX"),
+    # (CPU_TYPE_I386, CPU_SUBTYPE_PENT): ("pentium", "Intel Pentium"),
+    (CPU_TYPE_I386, CPU_SUBTYPE_586): ("i586", "Intel 80586"),
+    (CPU_TYPE_I386, CPU_SUBTYPE_PENTPRO): ("pentpro", "Intel Pentium Pro"),
+    # (CPU_TYPE_I386, CPU_SUBTYPE_PENTPRO): ("i686", "Intel Pentium Pro"),
+    (CPU_TYPE_I386, CPU_SUBTYPE_PENTII_M3): ("pentIIm3", "Intel Pentium II Model 3"),
+    (CPU_TYPE_I386, CPU_SUBTYPE_PENTII_M5): ("pentIIm5", "Intel Pentium II Model 5"),
+    (CPU_TYPE_I386, CPU_SUBTYPE_PENTIUM_4): ("pentium4", "Intel Pentium 4"),
+    (CPU_TYPE_I386, CPU_SUBTYPE_X86_64_H): ("x86_64h", "Intel x86-64h Haswell"),
+    (CPU_TYPE_X86_64, CPU_SUBTYPE_X86_64_ALL): ("x86_64", "Intel x86-64"),
+    (CPU_TYPE_X86_64, CPU_SUBTYPE_X86_64_H): ("x86_64h", "Intel x86-64h Haswell"),
+    (CPU_TYPE_ARM, CPU_SUBTYPE_ARM_ALL): ("arm", "ARM"),
+    (CPU_TYPE_ARM, CPU_SUBTYPE_ARM_V4T): ("armv4t", "arm v4t"),
+    (CPU_TYPE_ARM, CPU_SUBTYPE_ARM_V5TEJ): ("armv5", "arm v5"),
+    (CPU_TYPE_ARM, CPU_SUBTYPE_ARM_XSCALE): ("xscale", "arm xscale"),
+    (CPU_TYPE_ARM, CPU_SUBTYPE_ARM_V6): ("armv6", "arm v6"),
+    (CPU_TYPE_ARM, CPU_SUBTYPE_ARM_V6M): ("armv6m", "arm v6m"),
+    (CPU_TYPE_ARM, CPU_SUBTYPE_ARM_V7): ("armv7", "arm v7"),
+    (CPU_TYPE_ARM, CPU_SUBTYPE_ARM_V7F): ("armv7f", "arm v7f"),
+    (CPU_TYPE_ARM, CPU_SUBTYPE_ARM_V7S): ("armv7s", "arm v7s"),
+    (CPU_TYPE_ARM, CPU_SUBTYPE_ARM_V7K): ("armv7k", "arm v7k"),
+    (CPU_TYPE_ARM, CPU_SUBTYPE_ARM_V7M): ("armv7m", "arm v7m"),
+    (CPU_TYPE_ARM, CPU_SUBTYPE_ARM_V7EM): ("armv7em", "arm v7em"),
+    (CPU_TYPE_ARM, CPU_SUBTYPE_ARM_V8): ("armv8", "arm v8"),
+    (CPU_TYPE_ARM64, CPU_SUBTYPE_ARM64_ALL): ("arm64", "ARM64"),
+    (CPU_TYPE_ARM64, CPU_SUBTYPE_ARM64_V8): ("arm64", "arm64 v8"),
+    (CPU_TYPE_POWERPC, CPU_SUBTYPE_POWERPC_ALL): ("ppc", "PowerPC"),
+    (CPU_TYPE_POWERPC, CPU_SUBTYPE_POWERPC_601): ("ppc601", "PowerPC 601"),
+    (CPU_TYPE_POWERPC, CPU_SUBTYPE_POWERPC_603): ("ppc603", "PowerPC 603"),
+    (CPU_TYPE_POWERPC, CPU_SUBTYPE_POWERPC_603E): ("ppc603e", "PowerPC 603e"),
+    (CPU_TYPE_POWERPC, CPU_SUBTYPE_POWERPC_603EV): ("ppc603ev", "PowerPC 603ev"),
+    (CPU_TYPE_POWERPC, CPU_SUBTYPE_POWERPC_604): ("ppc604", "PowerPC 604"),
+    (CPU_TYPE_POWERPC, CPU_SUBTYPE_POWERPC_604E): ("ppc604e", "PowerPC 604e"),
+    (CPU_TYPE_POWERPC, CPU_SUBTYPE_POWERPC_750): ("ppc750", "PowerPC 750"),
+    (CPU_TYPE_POWERPC, CPU_SUBTYPE_POWERPC_7400): ("ppc7400", "PowerPC 7400"),
+    (CPU_TYPE_POWERPC, CPU_SUBTYPE_POWERPC_7450): ("ppc7450", "PowerPC 7450"),
+    (CPU_TYPE_POWERPC, CPU_SUBTYPE_POWERPC_970): ("ppc970", "PowerPC 970"),
+    (CPU_TYPE_POWERPC64, CPU_SUBTYPE_POWERPC_ALL): ("ppc64", "PowerPC 64-bit"),
+    (CPU_TYPE_POWERPC64, CPU_SUBTYPE_POWERPC_970): ("ppc970-64", "PowerPC 970 64-bit"),
+    (CPU_TYPE_ANY, CPU_SUBTYPE_MULTIPLE): ("any", "Architecture Independent"),
+    (CPU_TYPE_HPPA, CPU_SUBTYPE_HPPA_ALL): ("hppa", "HP-PA"),
+    (CPU_TYPE_I860, CPU_SUBTYPE_I860_ALL): ("i860", "Intel 860"),
+    (CPU_TYPE_MC680x0, CPU_SUBTYPE_MC680x0_ALL): ("m68k", "Motorola 68K"),
+    (CPU_TYPE_MC88000, CPU_SUBTYPE_MC88000_ALL): ("m88k", "Motorola 88K"),
+    (CPU_TYPE_SPARC, CPU_SUBTYPE_SPARC_ALL): ("sparc", "SPARC"),
+    (CPU_TYPE_VEO, CPU_SUBTYPE_VEO_ALL): ("veo", "veo"),
+    (CPU_TYPE_HPPA, CPU_SUBTYPE_HPPA_7100LC): ("hppa7100LC", "HP-PA 7100LC"),
+    (CPU_TYPE_MC680x0, CPU_SUBTYPE_MC68030_ONLY): ("m68030", "Motorola 68030"),
+    (CPU_TYPE_MC680x0, CPU_SUBTYPE_MC68040): ("m68040", "Motorola 68040"),
+    (CPU_TYPE_VEO, CPU_SUBTYPE_VEO_1): ("veo1", "veo 1"),
+    (CPU_TYPE_VEO, CPU_SUBTYPE_VEO_2): ("veo2", "veo 2"),
 }
-
-INTEL64_SUBTYPE = {
-    3: "CPU_SUBTYPE_X86_64_ALL",
-    4: "CPU_SUBTYPE_X86_ARCH1"
-}
-
-# define CPU_SUBTYPE_INTEL(f, m) ((cpu_subtype_t) (f) + ((m) << 4))
-INTEL_SUBTYPE = {
-    0: "CPU_SUBTYPE_INTEL_MODEL_ALL",
-    1: "CPU_THREADTYPE_INTEL_HTT",
-    3: "CPU_SUBTYPE_I386_ALL",
-    4: "CPU_SUBTYPE_486",
-    5: "CPU_SUBTYPE_586",
-    8: "CPU_SUBTYPE_PENTIUM_3",
-    9: "CPU_SUBTYPE_PENTIUM_M",
-    10: "CPU_SUBTYPE_PENTIUM_4",
-    11: "CPU_SUBTYPE_ITANIUM",
-    12: "CPU_SUBTYPE_XEON",
-    34: "CPU_SUBTYPE_XEON_MP",
-    42: "CPU_SUBTYPE_PENTIUM_4_M",
-    43: "CPU_SUBTYPE_ITANIUM_2",
-    38: "CPU_SUBTYPE_PENTPRO",
-    40: "CPU_SUBTYPE_PENTIUM_3_M",
-    52: "CPU_SUBTYPE_PENTIUM_3_XEON",
-    102: "CPU_SUBTYPE_PENTII_M3",
-    132: "CPU_SUBTYPE_486SX",
-    166: "CPU_SUBTYPE_PENTII_M5",
-    199: "CPU_SUBTYPE_CELERON",
-    231: "CPU_SUBTYPE_CELERON_MOBILE"
-}
-
-MC680_SUBTYPE = {
-    1: "CPU_SUBTYPE_MC680x0_ALL",
-    2: "CPU_SUBTYPE_MC68040",
-    3: "CPU_SUBTYPE_MC68030_ONLY"
-}
-
-MIPS_SUBTYPE = {
-    0: "CPU_SUBTYPE_MIPS_ALL",
-    1: "CPU_SUBTYPE_MIPS_R2300",
-    2: "CPU_SUBTYPE_MIPS_R2600",
-    3: "CPU_SUBTYPE_MIPS_R2800",
-    4: "CPU_SUBTYPE_MIPS_R2000a",
-    5: "CPU_SUBTYPE_MIPS_R2000",
-    6: "CPU_SUBTYPE_MIPS_R3000a",
-    7: "CPU_SUBTYPE_MIPS_R3000"
-}
-
-MC98000_SUBTYPE = {
-    0: "CPU_SUBTYPE_MC98000_ALL",
-    1: "CPU_SUBTYPE_MC98601"
-}
-
-HPPA_SUBTYPE = {
-    0: "CPU_SUBTYPE_HPPA_7100",
-    1: "CPU_SUBTYPE_HPPA_7100LC"
-}
-
-MC88_SUBTYPE = {
-    0: "CPU_SUBTYPE_MC88000_ALL",
-    1: "CPU_SUBTYPE_MC88100",
-    2: "CPU_SUBTYPE_MC88110"
-}
-
-SPARC_SUBTYPE = {
-    0: "CPU_SUBTYPE_SPARC_ALL"
-}
-
-I860_SUBTYPE = {
-    0: "CPU_SUBTYPE_I860_ALL",
-    1: "CPU_SUBTYPE_I860_860"
-}
-
-POWERPC_SUBTYPE = {
-    0: "CPU_SUBTYPE_POWERPC_ALL",
-    1: "CPU_SUBTYPE_POWERPC_601",
-    2: "CPU_SUBTYPE_POWERPC_602",
-    3: "CPU_SUBTYPE_POWERPC_603",
-    4: "CPU_SUBTYPE_POWERPC_603e",
-    5: "CPU_SUBTYPE_POWERPC_603ev",
-    6: "CPU_SUBTYPE_POWERPC_604",
-    7: "CPU_SUBTYPE_POWERPC_604e",
-    8: "CPU_SUBTYPE_POWERPC_620",
-    9: "CPU_SUBTYPE_POWERPC_750",
-    10: "CPU_SUBTYPE_POWERPC_7400",
-    11: "CPU_SUBTYPE_POWERPC_7450",
-    100: "CPU_SUBTYPE_POWERPC_970"
-}
-
-ARM_SUBTYPE = {
-    0: "CPU_SUBTYPE_ARM_ALL12",
-    5: "CPU_SUBTYPE_ARM_V4T",
-    6: "CPU_SUBTYPE_ARM_V6",
-    7: "CPU_SUBTYPE_ARM_V5TEJ",
-    8: "CPU_SUBTYPE_ARM_XSCALE",
-    9: "CPU_SUBTYPE_ARM_V7",
-    10: "CPU_SUBTYPE_ARM_V7F",
-    11: "CPU_SUBTYPE_ARM_V7S",
-    12: "CPU_SUBTYPE_ARM_V7K",
-    13: "CPU_SUBTYPE_ARM_V8",
-    14: "CPU_SUBTYPE_ARM_V6M",
-    15: "CPU_SUBTYPE_ARM_V7M",
-    16: "CPU_SUBTYPE_ARM_V7EM",
-}
-
-ARM64_SUBTYPE = {
-    0: "CPU_SUBTYPE_ARM64_ALL",
-    1: "CPU_SUBTYPE_ARM64_V8",
-}
-
-VAX_SUBTYPE = {
-    0: "CPU_SUBTYPE_VAX_ALL",
-    1: "CPU_SUBTYPE_VAX780",
-    2: "CPU_SUBTYPE_VAX785",
-    3: "CPU_SUBTYPE_VAX750",
-    4: "CPU_SUBTYPE_VAX730",
-    5: "CPU_SUBTYPE_UVAXI",
-    6: "CPU_SUBTYPE_UVAXII",
-    7: "CPU_SUBTYPE_VAX8200",
-    8: "CPU_SUBTYPE_VAX8500",
-    9: "CPU_SUBTYPE_VAX8600",
-    10: "CPU_SUBTYPE_VAX8650",
-    11: "CPU_SUBTYPE_VAX8800",
-    12: "CPU_SUBTYPE_UVAXIII",
-}
-
-
-def get_cpu_subtype(cpu_type, cpu_subtype):
-    st = cpu_subtype & 0x0fffffff
-
-    if cpu_type == 1:
-        subtype = VAX_SUBTYPE.get(st, st)
-    elif cpu_type == 6:
-        subtype = MC680_SUBTYPE.get(st, st)
-    elif cpu_type == 7:
-        subtype = INTEL_SUBTYPE.get(st, st)
-    elif cpu_type == 7 | _CPU_ARCH_ABI64:
-        subtype = INTEL64_SUBTYPE.get(st, st)
-    elif cpu_type == 8:
-        subtype = MIPS_SUBTYPE.get(st, st)
-    elif cpu_type == 10:
-        subtype = MC98000_SUBTYPE.get(st, st)
-    elif cpu_type == 11:
-        subtype = HPPA_SUBTYPE.get(st, st)
-    elif cpu_type == 12:
-        subtype = ARM_SUBTYPE.get(st, st)
-    elif cpu_type == 12 | _CPU_ARCH_ABI64:
-        subtype = ARM64_SUBTYPE.get(st, st)
-    elif cpu_type == 13:
-        subtype = MC88_SUBTYPE.get(st, st)
-    elif cpu_type == 14:
-        subtype = SPARC_SUBTYPE.get(st, st)
-    elif cpu_type == 15:
-        subtype = I860_SUBTYPE.get(st, st)
-    elif cpu_type == 16:
-        subtype = MIPS_SUBTYPE.get(st, st)
-    elif cpu_type == 18:
-        subtype = POWERPC_SUBTYPE.get(st, st)
-    elif cpu_type == 18 | _CPU_ARCH_ABI64:
-        subtype = POWERPC_SUBTYPE.get(st, st)
-    else:
-        subtype = str(st)
-
-    return subtype
-
 
 _MH_EXECUTE_SYM = "__mh_execute_header"
 MH_EXECUTE_SYM = "_mh_execute_header"
@@ -361,11 +396,13 @@ class mach_header(Structure):
                 dflags.append({'name': MH_FLAGS_NAMES.get(bit, str(bit)), 'description': MH_FLAGS_DESCRIPTIONS.get(bit, str(bit))})
                 flags = flags ^ bit
             bit <<= 1
+
+        cpu_str, cpusub_str = _CPU_TYPE_TABLE.get((self.cputype, self.cpusubtype), ('unknown', 'unknown'))
         return (
             ('magic', int(self.magic)),
-            ('cputype_string', CPU_TYPE_NAMES.get(self.cputype, self.cputype)),
+            ('cputype_string', cpu_str),
             ('cputype', int(self.cputype)),
-            ('cpusubtype_string', get_cpu_subtype(self.cputype, self.cpusubtype)),
+            ('cpusubtype_string', cpusub_str),
             ('cpusubtype', int(self.cpusubtype)),
             ('filetype_string', MH_FILETYPE_NAMES.get(self.filetype, self.filetype)),
             ('filetype', int(self.filetype)),
