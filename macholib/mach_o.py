@@ -200,8 +200,8 @@ MH_DYLINKER_SYM = "_mh_dylinker_header"
 
 (
     MH_OBJECT, MH_EXECUTE, MH_FVMLIB, MH_CORE, MH_PRELOAD, MH_DYLIB,
-    MH_DYLINKER, MH_BUNDLE, MH_DYLIB_STUB, MH_DSYM
-) = range(0x1, 0xb)
+    MH_DYLINKER, MH_BUNDLE, MH_DYLIB_STUB, MH_DSYM, MH_KEXT_BUNDLE
+) = range(0x1, 0xc)
 
 (
     MH_NOUNDEFS, MH_INCRLINK, MH_DYLDLINK, MH_BINDATLOAD, MH_PREBOUND,
@@ -209,8 +209,9 @@ MH_DYLINKER_SYM = "_mh_dylinker_header"
     MH_NOFIXPREBINDING, MH_PREBINDABLE, MH_ALLMODSBOUND, MH_SUBSECTIONS_VIA_SYMBOLS,
     MH_CANONICAL, MH_WEAK_DEFINES, MH_BINDS_TO_WEAK, MH_ALLOW_STACK_EXECUTION,
     MH_ROOT_SAFE, MH_SETUID_SAFE, MH_NO_REEXPORTED_DYLIBS, MH_PIE,
-    MH_DEAD_STRIPPABLE_DYLIB, MH_HAS_TLV_DESCRIPTORS, MH_NO_HEAP_EXECUTION
-) = map((1).__lshift__, range(25))
+    MH_DEAD_STRIPPABLE_DYLIB, MH_HAS_TLV_DESCRIPTORS, MH_NO_HEAP_EXECUTION,
+    MH_APP_EXTENSION_SAFE
+) = map((1).__lshift__, range(26))
 
 MH_MAGIC = 0xfeedface
 MH_CIGAM = 0xcefaedfe
@@ -232,6 +233,7 @@ MH_FILETYPE_NAMES = {
     MH_BUNDLE:      'dynamically bound bundle',
     MH_DYLIB_STUB:  'shared library stub for static linking',
     MH_DSYM:        'symbol information',
+    MH_KEXT_BUNDLE: 'x86_64 kexts',
 }
 
 MH_FILETYPE_SHORTNAMES = {
@@ -245,6 +247,7 @@ MH_FILETYPE_SHORTNAMES = {
     MH_BUNDLE:      'bundle',
     MH_DYLIB_STUB:  'dylib_stub',
     MH_DSYM:        'dsym',
+    MH_KEXT_BUNDLE: 'kext',
 }
 
 MH_FLAGS_NAMES = {
@@ -273,6 +276,7 @@ MH_FLAGS_NAMES = {
     MH_DEAD_STRIPPABLE_DYLIB:   'MH_DEAD_STRIPPABLE_DYLIB',
     MH_HAS_TLV_DESCRIPTORS:     'MH_HAS_TLV_DESCRIPTORS',
     MH_NO_HEAP_EXECUTION:       'MH_NO_HEAP_EXECUTION',
+    MH_APP_EXTENSION_SAFE:      'MH_APP_EXTENSION_SAFE',
 }
 
 MH_FLAGS_DESCRIPTIONS = {
@@ -301,6 +305,7 @@ MH_FLAGS_DESCRIPTIONS = {
     MH_DEAD_STRIPPABLE_DYLIB:   'the static linker will automatically not create a LC_LOAD_DYLIB load command to the dylib if no symbols are being referenced from the dylib',
     MH_HAS_TLV_DESCRIPTORS:     'contains a section of type S_THREAD_LOCAL_VARIABLES',
     MH_NO_HEAP_EXECUTION:       'the OS will run the main executable with a non-executable heap even on platforms that don\'t require it',
+    MH_APP_EXTENSION_SAFE:      'the code was linked for use in an application extension',
 }
 
 class mach_version_helper(Structure):
