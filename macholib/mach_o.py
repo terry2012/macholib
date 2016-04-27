@@ -677,42 +677,32 @@ class segment_command(Structure):
     )
 
     def describe(self):
-        segname = self.segname
         s = {}
-        s['segname'] = self.segname.rstrip('\x00')
+        if self.segment.find('\x00') != -1:
+            s['segname'] = self.segname[:self.segment.find('\x00')]
+        else:
+            s['segname'] = self.segname
         s['vmaddr'] = int(self.vmaddr)
         s['vmsize'] = int(self.vmsize)
         s['fileoff'] = int(self.fileoff)
         s['filesize'] = int(self.filesize)
-        s['initprot'] = self.get_initial_virtual_memory_protections()
+        s['initprot'] = self.get_vm_prot_desc(self.initprot)
         s['initprot_raw'] = int(self.initprot)
-        s['maxprot'] = self.get_max_virtual_memory_protections()
+        s['maxprot'] = self.get_vm_prot_desc(self.maxprot)
         s['maxprot_raw'] = int(self.maxprot)
         s['nsects'] = int(self.nsects)
         s['flags'] = self.flags
         return s
 
-    def get_initial_virtual_memory_protections(self):
+    def get_vm_prot_desc(self, prot):
         vm = []
-        if self.initprot == 0:
+        if prot == 0:
             vm.append("VM_PROT_NONE")
-        if self.initprot & 1:
+        if prot & 1:
             vm.append("VM_PROT_READ")
-        if self.initprot & 2:
+        if prot & 2:
             vm.append("VM_PROT_WRITE")
-        if self.initprot & 4:
-            vm.append("VM_PROT_EXECUTE")
-        return vm
-
-    def get_max_virtual_memory_protections(self):
-        vm = []
-        if self.maxprot == 0:
-            vm.append("VM_PROT_NONE")
-        if self.maxprot & 1:
-            vm.append("VM_PROT_READ")
-        if self.maxprot & 2:
-            vm.append("VM_PROT_WRITE")
-        if self.maxprot & 4:
+        if prot & 4:
             vm.append("VM_PROT_EXECUTE")
         return vm
 
@@ -737,35 +727,23 @@ class segment_command_64(Structure):
         s['vmsize'] = int(self.vmsize)
         s['fileoff'] = int(self.fileoff)
         s['filesize'] = int(self.filesize)
-        s['initprot'] = self.get_initial_virtual_memory_protections()
+        s['initprot'] = self.get_vm_prot_desc(self.initprot)
         s['initprot_raw'] = int(self.initprot)
-        s['maxprot'] = self.get_max_virtual_memory_protections()
+        s['maxprot'] = self.get_vm_prot_desc(self.maxprot)
         s['maxprot_raw'] = int(self.maxprot)
         s['nsects'] = int(self.nsects)
         s['flags'] = self.flags
         return s
 
-    def get_initial_virtual_memory_protections(self):
+    def get_vm_prot_desc(self, prot):
         vm = []
-        if self.initprot == 0:
+        if prot == 0:
             vm.append("VM_PROT_NONE")
-        if self.initprot & 1:
+        if prot & 1:
             vm.append("VM_PROT_READ")
-        if self.initprot & 2:
+        if prot & 2:
             vm.append("VM_PROT_WRITE")
-        if self.initprot & 4:
-            vm.append("VM_PROT_EXECUTE")
-        return vm
-
-    def get_max_virtual_memory_protections(self):
-        vm = []
-        if self.maxprot == 0:
-            vm.append("VM_PROT_NONE")
-        if self.maxprot & 1:
-            vm.append("VM_PROT_READ")
-        if self.maxprot & 2:
-            vm.append("VM_PROT_WRITE")
-        if self.maxprot & 4:
+        if prot & 4:
             vm.append("VM_PROT_EXECUTE")
         return vm
 
@@ -787,23 +765,30 @@ class section(Structure):
 
     def describe(self):
         s = {}
-        s['sectname'] = self.sectname.rstrip('\x00')
-        s['segname'] = self.segname.rstrip('\x00')
+        if self.secname.find('\x00') != -1:
+            s['sectname'] = self.sectname[:self.secname.find('\x00')]
+        else:
+            s['sectname'] = self.sectname
+        if self.segment.find('\x00') != -1:
+            s['segname'] = self.segname[:self.segment.find('\x00')]
+        else:
+            s['segname'] = self.segname
         s['addr'] = int(self.addr)
         s['size'] = int(self.size)
         s['offset'] = int(self.offset)
         s['align'] = int(self.align)
         s['reloff'] = int(self.reloff)
         s['nreloc'] = int(self.nreloc)
-        f = {}
-        f['type'] = _FLAG_SECTION_TYPES[int(self.flags) & SECTION_TYPE]
-        f['attributes'] = []
+        flags = {}
+        flags['type'] = _FLAG_SECTION_TYPES[int(self.flags) & SECTION_TYPE]
+        flags['type_raw'] = int(self.flags) & SECTION_TYPE
+        flags['attributes'] = []
+        flags['attributes_raw'] = []
         for k in _FLAG_SECTION_ATTRIBUTES:
             if k & self.flags:
-                f['attributes'].append(_FLAG_SECTION_ATTRIBUTES[k])
-        if not f['attributes']:
-            del f['attributes']
-        s['flags'] = f
+                flags['attributes'].append(_FLAG_SECTION_ATTRIBUTES[k])
+                flags['attributes_raw'].append(k)
+        s['flags'] = flags
         s['reserved1'] = int(self.reserved1)
         s['reserved2'] = int(self.reserved2)
         return s
@@ -830,23 +815,30 @@ class section_64(Structure):
 
     def describe(self):
         s = {}
-        s['sectname'] = self.sectname.rstrip('\x00')
-        s['segname'] = self.segname.rstrip('\x00')
+        if self.secname.find('\x00') != -1:
+            s['sectname'] = self.sectname[:self.secname.find('\x00')]
+        else:
+            s['sectname'] = self.sectname
+        if self.segment.find('\x00') != -1:
+            s['segname'] = self.segname[:self.segment.find('\x00')]
+        else:
+            s['segname'] = self.segname
         s['addr'] = int(self.addr)
         s['size'] = int(self.size)
         s['offset'] = int(self.offset)
         s['align'] = int(self.align)
         s['reloff'] = int(self.reloff)
         s['nreloc'] = int(self.nreloc)
-        f = {}
-        f['type'] = _FLAG_SECTION_TYPES[int(self.flags) & SECTION_TYPE]
-        f['attributes'] = []
+        flags = {}
+        flags['type'] = _FLAG_SECTION_TYPES[int(self.flags) & SECTION_TYPE]
+        flags['type_raw'] = int(self.flags) & SECTION_TYPE
+        flags['attributes'] = []
+        flags['attributes_raw'] = []
         for k in _FLAG_SECTION_ATTRIBUTES:
             if k & self.flags:
-                f['attributes'].append(_FLAG_SECTION_ATTRIBUTES[k])
-        if not f['attributes']:
-            del f['attributes']
-        s['flags'] = f
+                flags['attributes'].append(_FLAG_SECTION_ATTRIBUTES[k])
+                flags['attributes_raw'].append(k)
+        s['flags'] = flags
         s['reserved1'] = int(self.reserved1)
         s['reserved2'] = int(self.reserved2)
         s['reserved3'] = int(self.reserved3)
