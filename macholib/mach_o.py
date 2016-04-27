@@ -10,19 +10,19 @@ not covered at this point.
 
 See /usr/include/mach-o and friends.
 """
-import time
 
+import time
 from macholib.ptypes import *
 
 
-_CPU_ARCH_ABI64  = 0x01000000
+_CPU_ARCH_ABI64 = 0x01000000
 
 CPU_TYPE_NAMES = {
     -1:     'ANY',
     1:      'VAX',
     6:      'MC680x0',
     7:      'i386',
-    _CPU_ARCH_ABI64  | 7:    'x86_64',
+    _CPU_ARCH_ABI64 | 7:    'x86_64',
     8:      'MIPS',
     10:     'MC98000',
     11:     'HPPA',
@@ -33,132 +33,132 @@ CPU_TYPE_NAMES = {
     15:     'i860',
     16:     'Alpha',
     18:     'PowerPC',
-    _CPU_ARCH_ABI64  | 18:    'PowerPC64',
+    _CPU_ARCH_ABI64 | 18:    'PowerPC64',
 }
 
 INTEL64_SUBTYPE = {
-    3 : "CPU_SUBTYPE_X86_64_ALL",
-    4 : "CPU_SUBTYPE_X86_ARCH1"
+    3: "CPU_SUBTYPE_X86_64_ALL",
+    4: "CPU_SUBTYPE_X86_ARCH1"
 }
 
-#define CPU_SUBTYPE_INTEL(f, m) ((cpu_subtype_t) (f) + ((m) << 4))
+# define CPU_SUBTYPE_INTEL(f, m) ((cpu_subtype_t) (f) + ((m) << 4))
 INTEL_SUBTYPE = {
-    0 : "CPU_SUBTYPE_INTEL_MODEL_ALL",
-    1 : "CPU_THREADTYPE_INTEL_HTT",
-    3 : "CPU_SUBTYPE_I386_ALL",
-    4 : "CPU_SUBTYPE_486",
-    5 : "CPU_SUBTYPE_586",
-    8 : "CPU_SUBTYPE_PENTIUM_3",
-    9 : "CPU_SUBTYPE_PENTIUM_M",
-    10 : "CPU_SUBTYPE_PENTIUM_4",
-    11 : "CPU_SUBTYPE_ITANIUM",
-    12 : "CPU_SUBTYPE_XEON",
-    34 : "CPU_SUBTYPE_XEON_MP",
-    42 : "CPU_SUBTYPE_PENTIUM_4_M",
-    43 : "CPU_SUBTYPE_ITANIUM_2",
-    38 : "CPU_SUBTYPE_PENTPRO",
-    40 : "CPU_SUBTYPE_PENTIUM_3_M",
-    52 : "CPU_SUBTYPE_PENTIUM_3_XEON",
-    102 : "CPU_SUBTYPE_PENTII_M3",
-    132 : "CPU_SUBTYPE_486SX",
-    166 : "CPU_SUBTYPE_PENTII_M5",
-    199 : "CPU_SUBTYPE_CELERON",
-    231 : "CPU_SUBTYPE_CELERON_MOBILE"
+    0: "CPU_SUBTYPE_INTEL_MODEL_ALL",
+    1: "CPU_THREADTYPE_INTEL_HTT",
+    3: "CPU_SUBTYPE_I386_ALL",
+    4: "CPU_SUBTYPE_486",
+    5: "CPU_SUBTYPE_586",
+    8: "CPU_SUBTYPE_PENTIUM_3",
+    9: "CPU_SUBTYPE_PENTIUM_M",
+    10: "CPU_SUBTYPE_PENTIUM_4",
+    11: "CPU_SUBTYPE_ITANIUM",
+    12: "CPU_SUBTYPE_XEON",
+    34: "CPU_SUBTYPE_XEON_MP",
+    42: "CPU_SUBTYPE_PENTIUM_4_M",
+    43: "CPU_SUBTYPE_ITANIUM_2",
+    38: "CPU_SUBTYPE_PENTPRO",
+    40: "CPU_SUBTYPE_PENTIUM_3_M",
+    52: "CPU_SUBTYPE_PENTIUM_3_XEON",
+    102: "CPU_SUBTYPE_PENTII_M3",
+    132: "CPU_SUBTYPE_486SX",
+    166: "CPU_SUBTYPE_PENTII_M5",
+    199: "CPU_SUBTYPE_CELERON",
+    231: "CPU_SUBTYPE_CELERON_MOBILE"
 }
 
 MC680_SUBTYPE = {
-    1 : "CPU_SUBTYPE_MC680x0_ALL",
-    2 : "CPU_SUBTYPE_MC68040",
-    3 : "CPU_SUBTYPE_MC68030_ONLY"
+    1: "CPU_SUBTYPE_MC680x0_ALL",
+    2: "CPU_SUBTYPE_MC68040",
+    3: "CPU_SUBTYPE_MC68030_ONLY"
 }
 
 MIPS_SUBTYPE = {
-    0 : "CPU_SUBTYPE_MIPS_ALL",
-    1 : "CPU_SUBTYPE_MIPS_R2300",
-    2 : "CPU_SUBTYPE_MIPS_R2600",
-    3 : "CPU_SUBTYPE_MIPS_R2800",
-    4 : "CPU_SUBTYPE_MIPS_R2000a",
-    5 : "CPU_SUBTYPE_MIPS_R2000",
-    6 : "CPU_SUBTYPE_MIPS_R3000a",
-    7 : "CPU_SUBTYPE_MIPS_R3000"
+    0: "CPU_SUBTYPE_MIPS_ALL",
+    1: "CPU_SUBTYPE_MIPS_R2300",
+    2: "CPU_SUBTYPE_MIPS_R2600",
+    3: "CPU_SUBTYPE_MIPS_R2800",
+    4: "CPU_SUBTYPE_MIPS_R2000a",
+    5: "CPU_SUBTYPE_MIPS_R2000",
+    6: "CPU_SUBTYPE_MIPS_R3000a",
+    7: "CPU_SUBTYPE_MIPS_R3000"
 }
 
 MC98000_SUBTYPE = {
-    0 : "CPU_SUBTYPE_MC98000_ALL",
-    1 : "CPU_SUBTYPE_MC98601"
+    0: "CPU_SUBTYPE_MC98000_ALL",
+    1: "CPU_SUBTYPE_MC98601"
 }
 
 HPPA_SUBTYPE = {
-    0 : "CPU_SUBTYPE_HPPA_7100",
-    1 : "CPU_SUBTYPE_HPPA_7100LC"
+    0: "CPU_SUBTYPE_HPPA_7100",
+    1: "CPU_SUBTYPE_HPPA_7100LC"
 }
 
 MC88_SUBTYPE = {
-    0 : "CPU_SUBTYPE_MC88000_ALL",
-    1 : "CPU_SUBTYPE_MC88100",
-    2 : "CPU_SUBTYPE_MC88110"
+    0: "CPU_SUBTYPE_MC88000_ALL",
+    1: "CPU_SUBTYPE_MC88100",
+    2: "CPU_SUBTYPE_MC88110"
 }
 
 SPARC_SUBTYPE = {
-    0 : "CPU_SUBTYPE_SPARC_ALL"
+    0: "CPU_SUBTYPE_SPARC_ALL"
 }
 
 I860_SUBTYPE = {
-    0 : "CPU_SUBTYPE_I860_ALL",
-    1 : "CPU_SUBTYPE_I860_860"
+    0: "CPU_SUBTYPE_I860_ALL",
+    1: "CPU_SUBTYPE_I860_860"
 }
 
 POWERPC_SUBTYPE = {
-    0 : "CPU_SUBTYPE_POWERPC_ALL",
-    1 : "CPU_SUBTYPE_POWERPC_601",
-    2 : "CPU_SUBTYPE_POWERPC_602",
-    3 : "CPU_SUBTYPE_POWERPC_603",
-    4 : "CPU_SUBTYPE_POWERPC_603e",
-    5 : "CPU_SUBTYPE_POWERPC_603ev",
-    6 : "CPU_SUBTYPE_POWERPC_604",
-    7 : "CPU_SUBTYPE_POWERPC_604e",
-    8 : "CPU_SUBTYPE_POWERPC_620",
-    9 : "CPU_SUBTYPE_POWERPC_750",
-    10 : "CPU_SUBTYPE_POWERPC_7400",
-    11 : "CPU_SUBTYPE_POWERPC_7450",
-    100 : "CPU_SUBTYPE_POWERPC_970"
+    0: "CPU_SUBTYPE_POWERPC_ALL",
+    1: "CPU_SUBTYPE_POWERPC_601",
+    2: "CPU_SUBTYPE_POWERPC_602",
+    3: "CPU_SUBTYPE_POWERPC_603",
+    4: "CPU_SUBTYPE_POWERPC_603e",
+    5: "CPU_SUBTYPE_POWERPC_603ev",
+    6: "CPU_SUBTYPE_POWERPC_604",
+    7: "CPU_SUBTYPE_POWERPC_604e",
+    8: "CPU_SUBTYPE_POWERPC_620",
+    9: "CPU_SUBTYPE_POWERPC_750",
+    10: "CPU_SUBTYPE_POWERPC_7400",
+    11: "CPU_SUBTYPE_POWERPC_7450",
+    100: "CPU_SUBTYPE_POWERPC_970"
 }
 
 ARM_SUBTYPE = {
-    0 : "CPU_SUBTYPE_ARM_ALL12",
-    5 : "CPU_SUBTYPE_ARM_V4T",
-    6 : "CPU_SUBTYPE_ARM_V6",
-    7 : "CPU_SUBTYPE_ARM_V5TEJ",
-    8 : "CPU_SUBTYPE_ARM_XSCALE",
-    9 : "CPU_SUBTYPE_ARM_V7",
-    10 : "CPU_SUBTYPE_ARM_V7F",
-    11 : "CPU_SUBTYPE_ARM_V7S",
-    12 : "CPU_SUBTYPE_ARM_V7K",
-    13 : "CPU_SUBTYPE_ARM_V8",
-    14 : "CPU_SUBTYPE_ARM_V6M",
-    15 : "CPU_SUBTYPE_ARM_V7M",
-    16 : "CPU_SUBTYPE_ARM_V7EM",
+    0: "CPU_SUBTYPE_ARM_ALL12",
+    5: "CPU_SUBTYPE_ARM_V4T",
+    6: "CPU_SUBTYPE_ARM_V6",
+    7: "CPU_SUBTYPE_ARM_V5TEJ",
+    8: "CPU_SUBTYPE_ARM_XSCALE",
+    9: "CPU_SUBTYPE_ARM_V7",
+    10: "CPU_SUBTYPE_ARM_V7F",
+    11: "CPU_SUBTYPE_ARM_V7S",
+    12: "CPU_SUBTYPE_ARM_V7K",
+    13: "CPU_SUBTYPE_ARM_V8",
+    14: "CPU_SUBTYPE_ARM_V6M",
+    15: "CPU_SUBTYPE_ARM_V7M",
+    16: "CPU_SUBTYPE_ARM_V7EM",
 }
 
 ARM64_SUBTYPE = {
-    0 : "CPU_SUBTYPE_ARM64_ALL",
-    1 : "CPU_SUBTYPE_ARM64_V8",
+    0: "CPU_SUBTYPE_ARM64_ALL",
+    1: "CPU_SUBTYPE_ARM64_V8",
 }
 
 VAX_SUBTYPE = {
-    0 : "CPU_SUBTYPE_VAX_ALL",
-    1 : "CPU_SUBTYPE_VAX780",
-    2 : "CPU_SUBTYPE_VAX785",
-    3 : "CPU_SUBTYPE_VAX750",
-    4 : "CPU_SUBTYPE_VAX730",
-    5 : "CPU_SUBTYPE_UVAXI",
-    6 : "CPU_SUBTYPE_UVAXII",
-    7 : "CPU_SUBTYPE_VAX8200",
-    8 : "CPU_SUBTYPE_VAX8500",
-    9 : "CPU_SUBTYPE_VAX8600",
-    10 : "CPU_SUBTYPE_VAX8650",
-    11 : "CPU_SUBTYPE_VAX8800",
-    12 : "CPU_SUBTYPE_UVAXIII",
+    0: "CPU_SUBTYPE_VAX_ALL",
+    1: "CPU_SUBTYPE_VAX780",
+    2: "CPU_SUBTYPE_VAX785",
+    3: "CPU_SUBTYPE_VAX750",
+    4: "CPU_SUBTYPE_VAX730",
+    5: "CPU_SUBTYPE_UVAXI",
+    6: "CPU_SUBTYPE_UVAXII",
+    7: "CPU_SUBTYPE_VAX8200",
+    8: "CPU_SUBTYPE_VAX8500",
+    9: "CPU_SUBTYPE_VAX8600",
+    10: "CPU_SUBTYPE_VAX8650",
+    11: "CPU_SUBTYPE_VAX8800",
+    12: "CPU_SUBTYPE_UVAXIII",
 }
 
 
@@ -182,7 +182,7 @@ def get_cpu_subtype(cpu_type, cpu_subtype):
     elif cpu_type == 12:
         subtype = ARM_SUBTYPE.get(st, st)
     elif cpu_type == 12 | _CPU_ARCH_ABI64:
-        subtype = ARM64_SUBTYPE.gt(st, st)
+        subtype = ARM64_SUBTYPE.get(st, st)
     elif cpu_type == 13:
         subtype = MC88_SUBTYPE.get(st, st)
     elif cpu_type == 14:
@@ -223,7 +223,7 @@ MH_DYLINKER_SYM = "_mh_dylinker_header"
     MH_ROOT_SAFE, MH_SETUID_SAFE, MH_NO_REEXPORTED_DYLIBS, MH_PIE,
     MH_DEAD_STRIPPABLE_DYLIB, MH_HAS_TLV_DESCRIPTORS, MH_NO_HEAP_EXECUTION,
     MH_APP_EXTENSION_SAFE
-) = map((1).__lshift__, range(26))
+) = [1 << i for i in range(26)]
 
 MH_MAGIC = 0xfeedface
 MH_CIGAM = 0xcefaedfe
@@ -320,21 +320,26 @@ MH_FLAGS_DESCRIPTIONS = {
     MH_APP_EXTENSION_SAFE:      'the code was linked for use in an application extension',
 }
 
+
 class mach_version_helper(Structure):
     _fields_ = (
         ('major', p_ushort),
         ('minor', p_uint8),
         ('rev', p_uint8),
     )
+
     def __str__(self):
         return '%s.%s.%s' % (self.major, self.minor, self.rev)
+
 
 class mach_timestamp_helper(p_uint32):
     def __str__(self):
         return time.ctime(self)
 
+
 def read_struct(f, s, **kw):
     return s.from_fileobj(f, **kw)
+
 
 class mach_header(Structure):
     _fields_ = (
@@ -346,11 +351,12 @@ class mach_header(Structure):
         ('sizeofcmds', p_uint32),
         ('flags', p_uint32),
     )
+
     def _describe(self):
         bit = 1
         flags = self.flags
         dflags = []
-        while flags and bit < (1<<32):
+        while flags and bit < (1 << 32):
             if flags & bit:
                 dflags.append({'name': MH_FLAGS_NAMES.get(bit, str(bit)), 'description': MH_FLAGS_DESCRIPTIONS.get(bit, str(bit))})
                 flags = flags ^ bit
@@ -369,8 +375,10 @@ class mach_header(Structure):
             ('raw_flags', int(self.flags))
         )
 
+
 class mach_header_64(mach_header):
     _fields_ = mach_header._fields_ + (('reserved', p_uint32),)
+
 
 class load_command(Structure):
     _fields_ = (
@@ -424,9 +432,12 @@ LC_VERSION_MIN_WATCHOS = 0x30
 class lc_str(p_uint32):
     pass
 
+
 p_str16 = pypackable('p_str16', bytes, '16s')
 
 vm_prot_t = p_int32
+
+
 class segment_command(Structure):
     _fields_ = (
         ('segname', p_str16),
@@ -436,7 +447,7 @@ class segment_command(Structure):
         ('filesize', p_uint32),
         ('maxprot', vm_prot_t),
         ('initprot', vm_prot_t),
-        ('nsects', p_uint32), # read the section structures ?
+        ('nsects', p_uint32),  # read the section structures ?
         ('flags', p_uint32),
     )
 
@@ -479,6 +490,7 @@ class segment_command(Structure):
         if self.maxprot & 4:
             vm.append("VM_PROT_EXECUTE")
         return vm
+
 
 class segment_command_64(Structure):
     _fields_ = (
@@ -538,6 +550,7 @@ SG_FVMLIB = 0x2
 SG_NORELOC = 0x4
 SG_PROTECTED_VERSION_1 = 0x8
 
+
 class section(Structure):
     _fields_ = (
         ('sectname', p_str16),
@@ -578,6 +591,7 @@ class section(Structure):
 
     def add_section_data(self, data):
         self.section_data = data
+
 
 class section_64(Structure):
     _fields_ = (
@@ -622,6 +636,7 @@ class section_64(Structure):
     def add_section_data(self, data):
         self.section_data = data
 
+
 SECTION_TYPE = 0xff
 SECTION_ATTRIBUTES = 0xffffff00
 S_REGULAR = 0x0
@@ -648,42 +663,42 @@ S_THREAD_LOCAL_VARIABLE_POINTERS = 0x14
 S_THREAD_LOCAL_INIT_FUNCTION_POINTERS = 0x15
 
 FLAG_SECTION_TYPES = {
-    0x0 : "S_REGULAR",
-    0x1 : "S_ZEROFILL",
-    0x2 : "S_CSTRING_LITERALS",
-    0x3 : "S_4BYTE_LITERALS",
-    0x4 : "S_8BYTE_LITERALS",
-    0x5 : "S_LITERAL_POINTERS",
-    0x6 : "S_NON_LAZY_SYMBOL_POINTERS",
-    0x7 : "S_LAZY_SYMBOL_POINTERS",
-    0x8 : "S_SYMBOL_STUBS",
-    0x9 : "S_MOD_INIT_FUNC_POINTERS",
-    0xa : "S_MOD_TERM_FUNC_POINTERS",
-    0xb : "S_COALESCED",
-    0xc : "S_GB_ZEROFILL",
-    0xd : "S_INTERPOSING",
-    0xe : "S_16BYTE_LITERALS",
-    0xf : "S_DTRACE_DOF",
-    0x10 : "S_LAZY_DYLIB_SYMBOL_POINTERS",
-    0x11 : "S_THREAD_LOCAL_REGULAR",
-    0x12 : "S_THREAD_LOCAL_ZEROFILL",
-    0x13 : "S_THREAD_LOCAL_VARIABLES",
-    0x14 : "S_THREAD_LOCAL_VARIABLE_POINTERS",
-    0x15 : "S_THREAD_LOCAL_INIT_FUNCTION_POINTERS"
+    0x0: "S_REGULAR",
+    0x1: "S_ZEROFILL",
+    0x2: "S_CSTRING_LITERALS",
+    0x3: "S_4BYTE_LITERALS",
+    0x4: "S_8BYTE_LITERALS",
+    0x5: "S_LITERAL_POINTERS",
+    0x6: "S_NON_LAZY_SYMBOL_POINTERS",
+    0x7: "S_LAZY_SYMBOL_POINTERS",
+    0x8: "S_SYMBOL_STUBS",
+    0x9: "S_MOD_INIT_FUNC_POINTERS",
+    0xa: "S_MOD_TERM_FUNC_POINTERS",
+    0xb: "S_COALESCED",
+    0xc: "S_GB_ZEROFILL",
+    0xd: "S_INTERPOSING",
+    0xe: "S_16BYTE_LITERALS",
+    0xf: "S_DTRACE_DOF",
+    0x10: "S_LAZY_DYLIB_SYMBOL_POINTERS",
+    0x11: "S_THREAD_LOCAL_REGULAR",
+    0x12: "S_THREAD_LOCAL_ZEROFILL",
+    0x13: "S_THREAD_LOCAL_VARIABLES",
+    0x14: "S_THREAD_LOCAL_VARIABLE_POINTERS",
+    0x15: "S_THREAD_LOCAL_INIT_FUNCTION_POINTERS"
 }
 
 
 FLAG_SECTION_ATTRIBUTES = {
-    0x80000000 : "S_ATTR_PURE_INSTRUCTIONS",
-    0x40000000 : "S_ATTR_NO_TOC",
-    0x20000000 : "S_ATTR_STRIP_STATIC_SYMS",
-    0x10000000 : "S_ATTR_NO_DEAD_STRIP",
-    0x08000000 : "S_ATTR_LIVE_SUPPORT",
-    0x04000000 : "S_ATTR_SELF_MODIFYING_CODE",
-    0x02000000 : "S_ATTR_DEBUG",
-    0x00000400 : "S_ATTR_SOME_INSTRUCTIONS",
-    0x00000200 : "S_ATTR_EXT_RELOC",
-    0x00000100 : "S_ATTR_LOC_RELOC"
+    0x80000000: "S_ATTR_PURE_INSTRUCTIONS",
+    0x40000000: "S_ATTR_NO_TOC",
+    0x20000000: "S_ATTR_STRIP_STATIC_SYMS",
+    0x10000000: "S_ATTR_NO_DEAD_STRIP",
+    0x08000000: "S_ATTR_LIVE_SUPPORT",
+    0x04000000: "S_ATTR_SELF_MODIFYING_CODE",
+    0x02000000: "S_ATTR_DEBUG",
+    0x00000400: "S_ATTR_SOME_INSTRUCTIONS",
+    0x00000200: "S_ATTR_EXT_RELOC",
+    0x00000100: "S_ATTR_LOC_RELOC"
 }
 
 SECTION_ATTRIBUTES_USR = 0xff000000
@@ -700,25 +715,25 @@ S_ATTR_EXT_RELOC = 0x00000200
 S_ATTR_LOC_RELOC = 0x00000100
 
 
-SEG_PAGEZERO =    "__PAGEZERO"
-SEG_TEXT =    "__TEXT"
-SECT_TEXT =   "__text"
+SEG_PAGEZERO = "__PAGEZERO"
+SEG_TEXT = "__TEXT"
+SECT_TEXT = "__text"
 SECT_FVMLIB_INIT0 = "__fvmlib_init0"
 SECT_FVMLIB_INIT1 = "__fvmlib_init1"
-SEG_DATA =    "__DATA"
-SECT_DATA =   "__data"
-SECT_BSS =    "__bss"
+SEG_DATA = "__DATA"
+SECT_DATA = "__data"
+SECT_BSS = "__bss"
 SECT_COMMON = "__common"
-SEG_OBJC =    "__OBJC"
+SEG_OBJC = "__OBJC"
 SECT_OBJC_SYMBOLS = "__symbol_table"
 SECT_OBJC_MODULES = "__module_info"
 SECT_OBJC_STRINGS = "__selector_strs"
 SECT_OBJC_REFS = "__selector_refs"
-SEG_ICON =     "__ICON"
+SEG_ICON = "__ICON"
 SECT_ICON_HEADER = "__header"
-SECT_ICON_TIFF =   "__tiff"
-SEG_LINKEDIT =    "__LINKEDIT"
-SEG_UNIXSTACK =   "__UNIXSTACK"
+SECT_ICON_TIFF = "__tiff"
+SEG_LINKEDIT = "__LINKEDIT"
+SEG_UNIXSTACK = "__UNIXSTACK"
 SEG_IMPORT = "__IMPORT"
 
 #
@@ -727,12 +742,14 @@ SEG_IMPORT = "__IMPORT"
 #  so classes like fvmlib and fvmlib_command are equivalent.
 #
 
+
 class fvmlib(Structure):
     _fields_ = (
         ('name', lc_str),
         ('minor_version', mach_version_helper),
         ('header_addr', p_uint32),
     )
+
 
 class fvmlib_command(Structure):
     _fields_ = fvmlib._fields_
@@ -742,6 +759,7 @@ class fvmlib_command(Structure):
         s['header_addr'] = int(self.header_addr)
         return s
 
+
 class dylib(Structure):
     _fields_ = (
         ('name', lc_str),
@@ -749,6 +767,7 @@ class dylib(Structure):
         ('current_version', mach_version_helper),
         ('compatibility_version', mach_version_helper),
     )
+
 
 # merged dylib structure
 class dylib_command(Structure):
@@ -761,6 +780,7 @@ class dylib_command(Structure):
         s['compatibility_version'] = str(self.compatibility_version)
         return s
 
+
 class sub_framework_command(Structure):
     _fields_ = (
         ('umbrella', lc_str),
@@ -768,6 +788,7 @@ class sub_framework_command(Structure):
 
     def describe(self):
         return {}
+
 
 class sub_client_command(Structure):
     _fields_ = (
@@ -777,6 +798,7 @@ class sub_client_command(Structure):
     def describe(self):
         return {}
 
+
 class sub_umbrella_command(Structure):
     _fields_ = (
         ('sub_umbrella', lc_str),
@@ -785,6 +807,7 @@ class sub_umbrella_command(Structure):
     def describe(self):
         return {}
 
+
 class sub_library_command(Structure):
     _fields_ = (
         ('sub_library', lc_str),
@@ -792,6 +815,7 @@ class sub_library_command(Structure):
 
     def describe(self):
         return {}
+
 
 class prebound_dylib_command(Structure):
     _fields_ = (
@@ -803,6 +827,7 @@ class prebound_dylib_command(Structure):
     def describe(self):
         return {'nmodules': int(self.nmodules)}
 
+
 class dylinker_command(Structure):
     _fields_ = (
         ('name', lc_str),
@@ -811,6 +836,7 @@ class dylinker_command(Structure):
     def describe(self):
         return {}
 
+
 class thread_command(Structure):
     _fields_ = (
     )
@@ -818,10 +844,11 @@ class thread_command(Structure):
     def describe(self):
         return {}
 
+
 class entry_point_command(Structure):
     _fields_ = (
-	    ('entryoff', 	p_uint64),
-	    ('stacksize', 	p_uint64),
+        ('entryoff', p_uint64),
+        ('stacksize', p_uint64),
     )
 
     def describe(self):
@@ -829,6 +856,7 @@ class entry_point_command(Structure):
         s['entryoff'] = int(self.entryoff)
         s['stacksize'] = int(self.stacksize)
         return s
+
 
 class routines_command(Structure):
     _fields_ = (
@@ -854,6 +882,7 @@ class routines_command(Structure):
         s['reserved6'] = int(self.reserved6)
         return s
 
+
 class routines_command_64(Structure):
     _fields_ = (
         ('init_address', p_uint64),
@@ -877,6 +906,7 @@ class routines_command_64(Structure):
         s['reserved5'] = int(self.reserved5)
         s['reserved6'] = int(self.reserved6)
         return s
+
 
 class symtab_command(Structure):
     _fields_ = (
@@ -939,14 +969,17 @@ class dysymtab_command(Structure):
         dys['nlocrel'] = int(self.nlocrel)
         return dys
 
+
 INDIRECT_SYMBOL_LOCAL = 0x80000000
 INDIRECT_SYMBOL_ABS = 0x40000000
+
 
 class dylib_table_of_contents(Structure):
     _fields_ = (
         ('symbol_index', p_uint32),
         ('module_index', p_uint32),
     )
+
 
 class dylib_module(Structure):
     _fields_ = (
@@ -965,6 +998,7 @@ class dylib_module(Structure):
         ('objc_module_info_size', p_uint32),
     )
 
+
 class dylib_module_64(Structure):
     _fields_ = (
         ('module_name', p_uint32),
@@ -982,13 +1016,15 @@ class dylib_module_64(Structure):
         ('objc_module_info_addr', p_uint64),
     )
 
+
 class dylib_reference(Structure):
     _fields_ = (
         # XXX - ick, fix
         ('isym_flags', p_uint32),
-        #('isym', p_uint8 * 3),
-        #('flags', p_uint8),
+        # ('isym', p_uint8 * 3),
+        # ('flags', p_uint8),
     )
+
 
 class twolevel_hints_command(Structure):
     _fields_ = (
@@ -1002,6 +1038,7 @@ class twolevel_hints_command(Structure):
         s['nhints'] = int(self.nhints)
         return s
 
+
 class twolevel_hint(Structure):
     _fields_ = (
       # XXX - ick, fix
@@ -1010,6 +1047,7 @@ class twolevel_hint(Structure):
       #('itoc', p_uint8 * 3),
   )
 
+
 class prebind_cksum_command(Structure):
     _fields_ = (
         ('cksum', p_uint32),
@@ -1017,6 +1055,7 @@ class prebind_cksum_command(Structure):
 
     def describe(self):
         return {'cksum': int(self.cksum)}
+
 
 class symseg_command(Structure):
     _fields_ = (
@@ -1029,12 +1068,14 @@ class symseg_command(Structure):
         s['offset'] = int(self.offset)
         s['size'] = int(self.size)
 
+
 class ident_command(Structure):
     _fields_ = (
     )
 
     def describe(self):
         return {}
+
 
 class fvmfile_command(Structure):
     _fields_ = (
@@ -1045,6 +1086,7 @@ class fvmfile_command(Structure):
     def describe(self):
         return {'header_addr': int(self.header_addr)}
 
+
 class uuid_command (Structure):
     _fields_ = (
         ('uuid', p_str16),
@@ -1052,6 +1094,7 @@ class uuid_command (Structure):
 
     def describe(self):
         return {'uuid': self.uuid.rstrip('\x00')}
+
 
 class rpath_command (Structure):
     _fields_ = (
@@ -1099,6 +1142,7 @@ class version_min_command (Structure):
             'sdk': str(int(s1)) + "." + str(int(s2)) + "." + str(int(s3)),
         }
 
+
 class source_version_command (Structure):
     _fields_ = (
         ('version',   p_uint64),
@@ -1114,6 +1158,7 @@ class source_version_command (Structure):
         r = str(a)+'.'+str(b)+'.'+str(c)+'.'+str(d)+'.'+str(e)
         return {'version': r}
 
+
 class encryption_info_command (Structure):
     _fields_ = (
         ('cryptoff',    p_uint32),
@@ -1127,6 +1172,7 @@ class encryption_info_command (Structure):
         s['cryptsize'] = int(self.cryptsize)
         s['cryptid'] = int(self.cryptid)
         return s
+
 
 class encryption_info_command_64 (Structure):
     _fields_ = (
@@ -1172,6 +1218,7 @@ class dyld_info_command (Structure):
         dyld['export_off'] = int(self.export_off)
         dyld['export_size'] = int(self.export_size)
         return dyld
+
 
 class linker_option_command (Structure):
     _fields_ = (
@@ -1222,9 +1269,9 @@ LC_REGISTRY = {
     LC_VERSION_MIN_IPHONEOS: version_min_command,
     LC_FUNCTION_STARTS:  linkedit_data_command,
     LC_DYLD_ENVIRONMENT: dylinker_command,
-    LC_MAIN: 		entry_point_command,
-    LC_DATA_IN_CODE:	linkedit_data_command,
-    LC_SOURCE_VERSION:	source_version_command,
+    LC_MAIN:        entry_point_command,
+    LC_DATA_IN_CODE:    linkedit_data_command,
+    LC_SOURCE_VERSION:  source_version_command,
     LC_DYLIB_CODE_SIGN_DRS:  linkedit_data_command,
     LC_ENCRYPTION_INFO_64: encryption_info_command_64,
     LC_LINKER_OPTION:  linker_option_command,
@@ -1285,9 +1332,10 @@ LC_NAMES = {
 }
 
 
-#this is another union.
+# this is another union.
 class n_un(p_int32):
     pass
+
 
 class nlist(Structure):
     _fields_ = (
@@ -1297,6 +1345,7 @@ class nlist(Structure):
         ('n_desc', p_short),
         ('n_value', p_uint32),
     )
+
 
 class nlist_64(Structure):
     _fields_ = [
@@ -1331,8 +1380,10 @@ REFERENCE_FLAG_PRIVATE_UNDEFINED_LAZY = 5
 
 REFERENCED_DYNAMICALLY = 0x0010
 
+
 def GET_LIBRARY_ORDINAL(n_desc):
     return (((n_desc) >> 8) & 0xff)
+
 
 def SET_LIBRARY_ORDINAL(n_desc, ordinal):
     return (((n_desc) & 0x00ff) | (((ordinal & 0xff) << 8)))
@@ -1348,11 +1399,14 @@ N_WEAK_DEF = 0x0080
 
 # /usr/include/mach-o/fat.h
 FAT_MAGIC = 0xcafebabe
+
+
 class fat_header(Structure):
     _fields_ = (
         ('magic', p_uint32),
         ('nfat_arch', p_uint32),
     )
+
 
 class fat_arch(Structure):
     _fields_ = (

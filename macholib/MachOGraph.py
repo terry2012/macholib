@@ -3,7 +3,6 @@ Utilities for reading and writing Mach-O headers
 """
 
 import os
-import sys
 
 from altgraph.Graph import Graph
 from altgraph.ObjectGraph import ObjectGraph
@@ -20,6 +19,7 @@ try:
 except NameError:
     unicode = str
 
+
 class MissingMachO(object):
     def __init__(self, filename):
         self.graphident = filename
@@ -27,6 +27,7 @@ class MissingMachO(object):
 
     def __repr__(self):
         return '<%s graphident=%r>' % (type(self).__name__, self.graphident)
+
 
 class MachOGraph(ObjectGraph):
     """
@@ -45,8 +46,8 @@ class MachOGraph(ObjectGraph):
             if fn is None:
                 try:
                     fn = dyld_find(filename, env=self.env,
-                        executable_path=self.executable_path,
-                        loader=loader.filename)
+                                   executable_path=self.executable_path,
+                                   loader_path=loader.filename)
                     self.trans_table[(loader.filename, filename)] = fn
                 except ValueError:
                     return None
@@ -56,7 +57,7 @@ class MachOGraph(ObjectGraph):
             if fn is None:
                 try:
                     fn = dyld_find(filename, env=self.env,
-                        executable_path=self.executable_path)
+                                   executable_path=self.executable_path)
                     self.trans_table[filename] = fn
                 except ValueError:
                     return None
@@ -120,6 +121,7 @@ class MachOGraph(ObjectGraph):
         if fileobj is None:
             fileobj = sys.stdout
         fileobj.writelines(self.itergraphreport())
+
 
 def main(args):
     g = MachOGraph()

@@ -10,7 +10,6 @@ try:
 except ImportError:
     izip, imap = zip, map
 from itertools import chain, starmap
-import warnings
 
 __all__ = """
 sizeof
@@ -40,6 +39,7 @@ p_float
 p_double
 """.split()
 
+
 def sizeof(s):
     """
     Return the size of an object when packed
@@ -51,6 +51,7 @@ def sizeof(s):
         return len(s)
 
     raise ValueError(s)
+
 
 class MetaPackable(type):
     """
@@ -68,6 +69,7 @@ class MetaPackable(type):
 
     def from_tuple(cls, tpl, **kw):
         return cls(tpl[0], **kw)
+
 
 class BasePackable(object):
     _endian_ = '>'
@@ -95,6 +97,7 @@ def _make():
 Packable = _make()
 del _make
 
+
 def pypackable(name, pytype, format):
     """
     Create a "mix-in" class with a python type and a
@@ -107,12 +110,14 @@ def pypackable(name, pytype, format):
         '_items_': items,
     })
 
+
 def _formatinfo(format):
     """
     Calculate the size and number of items in a struct format.
     """
     size = struct.calcsize(format)
     return size, len(struct.unpack(format, b'\x00' * size))
+
 
 class MetaStructure(MetaPackable):
     """
@@ -168,6 +173,7 @@ class MetaStructure(MetaPackable):
             values.append(typ.from_tuple(tpl[begin:current], **kw))
         values.extend(tpl[current:])
         return cls(*values, **kw)
+
 
 # See metaclass discussion earlier in this file
 def _make():
