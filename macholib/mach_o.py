@@ -367,11 +367,6 @@ _MH_FLAGS_DESCRIPTIONS = {
     MH_APP_EXTENSION_SAFE:      'the code was linked for use in an application extension',
 }
 
-MH_MAGIC = 0xfeedface
-MH_CIGAM = 0xcefaedfe
-MH_MAGIC_64 = 0xfeedfacf
-MH_CIGAM_64 = 0xcffaedfe
-
 _MH_EXECUTE_SYM = "__mh_execute_header"
 MH_EXECUTE_SYM = "_mh_execute_header"
 _MH_BUNDLE_SYM = "__mh_bundle_header"
@@ -595,20 +590,12 @@ _FLAG_SECTION_ATTRIBUTES = {
 }
 
 
-class mach_version_helper(Structure):
-    _fields_ = (
-        ('major', p_ushort),
-        ('minor', p_uint8),
-        ('rev', p_uint8),
-    )
+# Mach-O header
 
-    def __str__(self):
-        return '%s.%s.%s' % (self.major, self.minor, self.rev)
-
-
-class mach_timestamp_helper(p_uint32):
-    def __str__(self):
-        return time.ctime(self)
+MH_MAGIC = 0xfeedface
+MH_CIGAM = 0xcefaedfe
+MH_MAGIC_64 = 0xfeedfacf
+MH_CIGAM_64 = 0xcffaedfe
 
 
 class mach_header(Structure):
@@ -630,12 +617,14 @@ class mach_header(Structure):
             if flags & bit:
                 dflags.append({
                     'name': _MH_FLAGS_NAMES.get(bit, str(bit)),
+                    'value': bit,
                     'description': _MH_FLAGS_DESCRIPTIONS.get(bit, str(bit))
                 })
                 flags = flags ^ bit
             bit <<= 1
 
-        cpu_str, cpusub_str = _CPU_TYPE_TABLE.get((self.cputype, self.cpusubtype), ('unknown', 'unknown'))
+        cpu_str, cpusub_str = _CPU_TYPE_TABLE.get((self.cputype, self.cpusubtype),
+                                                  (str(self.cputype), str(self.cpusubtype)))
         return (
             ('magic', int(self.magic)),
             ('cputype_string', cpu_str),
@@ -872,6 +861,22 @@ class section_64(Structure):
 #  are no different.  I decided to keep the load commands separate,
 #  so classes like fvmlib and fvmlib_command are equivalent.
 #
+
+class mach_version_helper(Structure):
+    _fields_ = (
+        ('major', p_ushort),
+        ('minor', p_uint8),
+        ('rev', p_uint8),
+    )
+
+    def __str__(self):
+        return '%s.%s.%s' % (self.major, self.minor, self.rev)
+
+
+class mach_timestamp_helper(p_uint32):
+    # TODO: this maybe not suitable for dump
+    def __str__(self):
+        return time.ctime(self)
 
 
 class fvmlib(Structure):
