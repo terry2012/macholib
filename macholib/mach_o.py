@@ -1088,7 +1088,16 @@ class version_min_command (Structure):
         v2 = v & 0xFF
         v = v >> 8
         v1 = v & 0xFFFF
-        return {'version': str(int(v1)) + "." + str(int(v2)) + "." + str(int(v3))}
+        s = int(self.sdk)
+        s3 = s & 0xFF
+        s = s >> 8
+        s2 = s & 0xFF
+        s = s >> 8
+        s1 = s & 0xFFFF
+        return {
+            'version': str(int(v1)) + "." + str(int(v2)) + "." + str(int(v3)),
+            'sdk': str(int(s1)) + "." + str(int(s2)) + "." + str(int(s3)),
+        }
 
 class source_version_command (Structure):
     _fields_ = (
