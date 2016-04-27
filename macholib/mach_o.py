@@ -132,7 +132,17 @@ ARM_SUBTYPE = {
     8 : "CPU_SUBTYPE_ARM_XSCALE",
     9 : "CPU_SUBTYPE_ARM_V7",
     10 : "CPU_SUBTYPE_ARM_V7F",
-    12 : "CPU_SUBTYPE_ARM_V7K"
+    11 : "CPU_SUBTYPE_ARM_V7S",
+    12 : "CPU_SUBTYPE_ARM_V7K",
+    13 : "CPU_SUBTYPE_ARM_V8",
+    14 : "CPU_SUBTYPE_ARM_V6M",
+    15 : "CPU_SUBTYPE_ARM_V7M",
+    16 : "CPU_SUBTYPE_ARM_V7EM",
+}
+
+ARM64_SUBTYPE = {
+    0 : "CPU_SUBTYPE_ARM64_ALL",
+    1 : "CPU_SUBTYPE_ARM64_V8",
 }
 
 VAX_SUBTYPE = {
@@ -171,6 +181,8 @@ def get_cpu_subtype(cpu_type, cpu_subtype):
         subtype = HPPA_SUBTYPE.get(st, st)
     elif cpu_type == 12:
         subtype = ARM_SUBTYPE.get(st, st)
+    elif cpu_type == 12 | _CPU_ARCH_ABI64:
+        subtype = ARM64_SUBTYPE.gt(st, st)
     elif cpu_type == 13:
         subtype = MC88_SUBTYPE.get(st, st)
     elif cpu_type == 14:
