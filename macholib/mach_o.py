@@ -21,6 +21,9 @@ from macholib.ptypes import *
 #   - http://opensource.apple.com/source/cctools/cctools-862/libmacho/arch.c
 #   - man 3 arch
 
+cpu_type_t = p_uint32
+cpu_subtype_t = p_uint32
+
 CPU_ARCH_ABI64 = 0x1000000
 
 CPU_TYPE_ANY = -1
@@ -236,40 +239,21 @@ _CPU_TYPE_TABLE = {
     (CPU_TYPE_VEO, CPU_SUBTYPE_VEO_2): ("veo2", "veo 2"),
 }
 
-_MH_EXECUTE_SYM = "__mh_execute_header"
-MH_EXECUTE_SYM = "_mh_execute_header"
-_MH_BUNDLE_SYM = "__mh_bundle_header"
-MH_BUNDLE_SYM = "_mh_bundle_header"
-_MH_DYLIB_SYM = "__mh_dylib_header"
-MH_DYLIB_SYM = "_mh_dylib_header"
-_MH_DYLINKER_SYM = "__mh_dylinker_header"
-MH_DYLINKER_SYM = "_mh_dylinker_header"
 
-(
-    MH_OBJECT, MH_EXECUTE, MH_FVMLIB, MH_CORE, MH_PRELOAD, MH_DYLIB,
-    MH_DYLINKER, MH_BUNDLE, MH_DYLIB_STUB, MH_DSYM, MH_KEXT_BUNDLE
-) = range(0x1, 0xc)
+# Constants for the filetype field of the mach_header
+MH_OBJECT = 0x01
+MH_EXECUTE = 0x02
+MH_FVMLIB = 0x03
+MH_CORE = 0x04
+MH_PRELOAD = 0x05
+MH_DYLIB = 0x06
+MH_DYLINKER = 0x07
+MH_BUNDLE = 0x08
+MH_DYLIB_STUB = 0x09
+MH_DSYM = 0xa
+MH_KEXT_BUNDLE = 0xb
 
-(
-    MH_NOUNDEFS, MH_INCRLINK, MH_DYLDLINK, MH_BINDATLOAD, MH_PREBOUND,
-    MH_SPLIT_SEGS, MH_LAZY_INIT, MH_TWOLEVEL, MH_FORCE_FLAT, MH_NOMULTIDEFS,
-    MH_NOFIXPREBINDING, MH_PREBINDABLE, MH_ALLMODSBOUND, MH_SUBSECTIONS_VIA_SYMBOLS,
-    MH_CANONICAL, MH_WEAK_DEFINES, MH_BINDS_TO_WEAK, MH_ALLOW_STACK_EXECUTION,
-    MH_ROOT_SAFE, MH_SETUID_SAFE, MH_NO_REEXPORTED_DYLIBS, MH_PIE,
-    MH_DEAD_STRIPPABLE_DYLIB, MH_HAS_TLV_DESCRIPTORS, MH_NO_HEAP_EXECUTION,
-    MH_APP_EXTENSION_SAFE
-) = [1 << i for i in range(26)]
-
-MH_MAGIC = 0xfeedface
-MH_CIGAM = 0xcefaedfe
-MH_MAGIC_64 = 0xfeedfacf
-MH_CIGAM_64 = 0xcffaedfe
-
-integer_t = p_int32
-cpu_type_t = integer_t
-cpu_subtype_t = p_uint32
-
-MH_FILETYPE_NAMES = {
+_MH_FILETYPE_NAMES = {
     MH_OBJECT:      'relocatable object',
     MH_EXECUTE:     'demand paged executable',
     MH_FVMLIB:      'fixed vm shared library',
@@ -283,7 +267,7 @@ MH_FILETYPE_NAMES = {
     MH_KEXT_BUNDLE: 'x86_64 kexts',
 }
 
-MH_FILETYPE_SHORTNAMES = {
+_MH_FILETYPE_SHORTNAMES = {
     MH_OBJECT:      'object',
     MH_EXECUTE:     'execute',
     MH_FVMLIB:      'fvmlib',
@@ -297,7 +281,35 @@ MH_FILETYPE_SHORTNAMES = {
     MH_KEXT_BUNDLE: 'kext',
 }
 
-MH_FLAGS_NAMES = {
+
+MH_NOUNDEFS = 0x1
+MH_INCRLINK = 0x2
+MH_DYLDLINK = 0x4
+MH_BINDATLOAD = 0x8
+MH_PREBOUND = 0x10
+MH_SPLIT_SEGS = 0x20
+MH_LAZY_INIT = 0x40
+MH_TWOLEVEL = 0x80
+MH_FORCE_FLAT = 0x100
+MH_NOMULTIDEFS = 0x200
+MH_NOFIXPREBINDING = 0x400
+MH_PREBINDABLE = 0x800
+MH_ALLMODSBOUND = 0x1000
+MH_SUBSECTIONS_VIA_SYMBOLS = 0x2000
+MH_CANONICAL = 0x4000
+MH_WEAK_DEFINES = 0x8000
+MH_BINDS_TO_WEAK = 0x10000
+MH_ALLOW_STACK_EXECUTION = 0x20000
+MH_ROOT_SAFE = 0x40000
+MH_SETUID_SAFE = 0x80000
+MH_NO_REEXPORTED_DYLIBS = 0x100000
+MH_PIE = 0x200000
+MH_DEAD_STRIPPABLE_DYLIB = 0x400000
+MH_HAS_TLV_DESCRIPTORS = 0x800000
+MH_NO_HEAP_EXECUTION = 0x1000000
+MH_APP_EXTENSION_SAFE = 0x2000000
+
+_MH_FLAGS_NAMES = {
     MH_NOUNDEFS:                'MH_NOUNDEFS',
     MH_INCRLINK:                'MH_INCRLINK',
     MH_DYLDLINK:                'MH_DYLDLINK',
@@ -326,7 +338,7 @@ MH_FLAGS_NAMES = {
     MH_APP_EXTENSION_SAFE:      'MH_APP_EXTENSION_SAFE',
 }
 
-MH_FLAGS_DESCRIPTIONS = {
+_MH_FLAGS_DESCRIPTIONS = {
     MH_NOUNDEFS:                'no undefined references',
     MH_INCRLINK:                'output of an incremental link',
     MH_DYLDLINK:                'input for the dynamic linker',
@@ -355,93 +367,52 @@ MH_FLAGS_DESCRIPTIONS = {
     MH_APP_EXTENSION_SAFE:      'the code was linked for use in an application extension',
 }
 
+MH_MAGIC = 0xfeedface
+MH_CIGAM = 0xcefaedfe
+MH_MAGIC_64 = 0xfeedfacf
+MH_CIGAM_64 = 0xcffaedfe
 
-class mach_version_helper(Structure):
-    _fields_ = (
-        ('major', p_ushort),
-        ('minor', p_uint8),
-        ('rev', p_uint8),
-    )
-
-    def __str__(self):
-        return '%s.%s.%s' % (self.major, self.minor, self.rev)
-
-
-class mach_timestamp_helper(p_uint32):
-    def __str__(self):
-        return time.ctime(self)
+_MH_EXECUTE_SYM = "__mh_execute_header"
+MH_EXECUTE_SYM = "_mh_execute_header"
+_MH_BUNDLE_SYM = "__mh_bundle_header"
+MH_BUNDLE_SYM = "_mh_bundle_header"
+_MH_DYLIB_SYM = "__mh_dylib_header"
+MH_DYLIB_SYM = "_mh_dylib_header"
+_MH_DYLINKER_SYM = "__mh_dylinker_header"
+MH_DYLINKER_SYM = "_mh_dylinker_header"
 
 
-def read_struct(f, s, **kw):
-    return s.from_fileobj(f, **kw)
-
-
-class mach_header(Structure):
-    _fields_ = (
-        ('magic', p_uint32),
-        ('cputype', cpu_type_t),
-        ('cpusubtype', cpu_subtype_t),
-        ('filetype', p_uint32),
-        ('ncmds', p_uint32),
-        ('sizeofcmds', p_uint32),
-        ('flags', p_uint32),
-    )
-
-    def _describe(self):
-        bit = 1
-        flags = self.flags
-        dflags = []
-        while flags and bit < (1 << 32):
-            if flags & bit:
-                dflags.append({'name': MH_FLAGS_NAMES.get(bit, str(bit)), 'description': MH_FLAGS_DESCRIPTIONS.get(bit, str(bit))})
-                flags = flags ^ bit
-            bit <<= 1
-
-        cpu_str, cpusub_str = _CPU_TYPE_TABLE.get((self.cputype, self.cpusubtype), ('unknown', 'unknown'))
-        return (
-            ('magic', int(self.magic)),
-            ('cputype_string', cpu_str),
-            ('cputype', int(self.cputype)),
-            ('cpusubtype_string', cpusub_str),
-            ('cpusubtype', int(self.cpusubtype)),
-            ('filetype_string', MH_FILETYPE_NAMES.get(self.filetype, self.filetype)),
-            ('filetype', int(self.filetype)),
-            ('ncmds', self.ncmds),
-            ('sizeofcmds', self.sizeofcmds),
-            ('flags', dflags),
-            ('raw_flags', int(self.flags))
-        )
-
-
-class mach_header_64(mach_header):
-    _fields_ = mach_header._fields_ + (('reserved', p_uint32),)
-
-
-class load_command(Structure):
-    _fields_ = (
-        ('cmd', p_uint32),
-        ('cmdsize', p_uint32),
-    )
-
-    def get_cmd_name(self):
-        return LC_NAMES.get(self.cmd, self.cmd)
-
+# Constants for load commands
 LC_REQ_DYLD = 0x80000000
 
-(
-    LC_SEGMENT, LC_SYMTAB, LC_SYMSEG, LC_THREAD, LC_UNIXTHREAD, LC_LOADFVMLIB,
-    LC_IDFVMLIB, LC_IDENT, LC_FVMFILE, LC_PREPAGE, LC_DYSYMTAB, LC_LOAD_DYLIB,
-    LC_ID_DYLIB, LC_LOAD_DYLINKER, LC_ID_DYLINKER, LC_PREBOUND_DYLIB,
-    LC_ROUTINES, LC_SUB_FRAMEWORK, LC_SUB_UMBRELLA, LC_SUB_CLIENT,
-    LC_SUB_LIBRARY, LC_TWOLEVEL_HINTS, LC_PREBIND_CKSUM
-) = range(0x1, 0x18)
-
-LC_LOAD_WEAK_DYLIB = LC_REQ_DYLD | 0x18
-
+LC_SEGMENT = 0x1
+LC_SYMTAB = 0x2
+LC_SYMSEG = 0x3
+LC_THREAD = 0x4
+LC_UNIXTHREAD = 0x5
+LC_LOADFVMLIB = 0x6
+LC_IDFVMLIB = 0x7
+LC_IDENT = 0x8
+LC_FVMFILE = 0x9
+LC_PREPAGE = 0xa
+LC_DYSYMTAB = 0xb
+LC_LOAD_DYLIB = 0xc
+LC_ID_DYLIB = 0xd
+LC_LOAD_DYLINKER = 0xe
+LC_ID_DYLINKER = 0xf
+LC_PREBOUND_DYLIB = 0x10
+LC_ROUTINES = 0x11
+LC_SUB_FRAMEWORK = 0x12
+LC_SUB_UMBRELLA = 0x13
+LC_SUB_CLIENT = 0x14
+LC_SUB_LIBRARY = 0x15
+LC_TWOLEVEL_HINTS = 0x16
+LC_PREBIND_CKSUM = 0x17
+LC_LOAD_WEAK_DYLIB = 0x18 | LC_REQ_DYLD
 LC_SEGMENT_64 = 0x19
 LC_ROUTINES_64 = 0x1a
 LC_UUID = 0x1b
-LC_RPATH = (0x1c | LC_REQ_DYLD)
+LC_RPATH = 0x1c | LC_REQ_DYLD
 LC_CODE_SIGNATURE = 0x1d
 LC_CODE_SEGMENT_SPLIT_INFO = 0x1e
 LC_REEXPORT_DYLIB = 0x1f | LC_REQ_DYLD
@@ -464,6 +435,235 @@ LC_LINKER_OPTIMIZATION_HINT = 0x2e
 LC_VERSION_MIN_TVOS = 0x2f
 LC_VERSION_MIN_WATCHOS = 0x30
 
+_LC_NAMES = {
+    LC_SEGMENT:                     'LC_SEGMENT',
+    LC_IDFVMLIB:                    'LC_IDFVMLIB',
+    LC_LOADFVMLIB:                  'LC_LOADFVMLIB',
+    LC_ID_DYLIB:                    'LC_ID_DYLIB',
+    LC_LOAD_DYLIB:                  'LC_LOAD_DYLIB',
+    LC_LOAD_WEAK_DYLIB:             'LC_LOAD_WEAK_DYLIB',
+    LC_SUB_FRAMEWORK:               'LC_SUB_FRAMEWORK',
+    LC_SUB_CLIENT:                  'LC_SUB_CLIENT',
+    LC_SUB_UMBRELLA:                'LC_SUB_UMBRELLA',
+    LC_SUB_LIBRARY:                 'LC_SUB_LIBRARY',
+    LC_PREBOUND_DYLIB:              'LC_PREBOUND_DYLIB',
+    LC_ID_DYLINKER:                 'LC_ID_DYLINKER',
+    LC_LOAD_DYLINKER:               'LC_LOAD_DYLINKER',
+    LC_THREAD:                      'LC_THREAD',
+    LC_UNIXTHREAD:                  'LC_UNIXTHREAD',
+    LC_ROUTINES:                    'LC_ROUTINES',
+    LC_SYMTAB:                      'LC_SYMTAB',
+    LC_DYSYMTAB:                    'LC_DYSYMTAB',
+    LC_TWOLEVEL_HINTS:              'LC_TWOLEVEL_HINTS',
+    LC_PREBIND_CKSUM:               'LC_PREBIND_CKSUM',
+    LC_SYMSEG:                      'LC_SYMSEG',
+    LC_IDENT:                       'LC_IDENT',
+    LC_FVMFILE:                     'LC_FVMFILE',
+    LC_SEGMENT_64:                  'LC_SEGMENT_64',
+    LC_ROUTINES_64:                 'LC_ROUTINES_64',
+    LC_UUID:                        'LC_UUID',
+    LC_RPATH:                       'LC_RPATH',
+    LC_CODE_SIGNATURE:              'LC_CODE_SIGNATURE',
+    LC_CODE_SEGMENT_SPLIT_INFO:     'LC_CODE_SEGMENT_SPLIT_INFO',
+    LC_REEXPORT_DYLIB:              'LC_REEXPORT_DYLIB',
+    LC_LAZY_LOAD_DYLIB:             'LC_LAZY_LOAD_DYLIB',
+    LC_ENCRYPTION_INFO:             'LC_ENCRYPTION_INFO',
+    LC_DYLD_INFO:                   'LC_DYLD_INFO',
+    LC_DYLD_INFO_ONLY:              'LC_DYLD_INFO_ONLY',
+    LC_LOAD_UPWARD_DYLIB:           'LC_LOAD_UPWARD_DYLIB',
+    LC_VERSION_MIN_MACOSX:          'LC_VERSION_MIN_MACOSX',
+    LC_VERSION_MIN_IPHONEOS:        'LC_VERSION_MIN_IPHONEOS',
+    LC_FUNCTION_STARTS:             'LC_FUNCTION_STARTS',
+    LC_DYLD_ENVIRONMENT:            'LC_DYLD_ENVIRONMENT',
+    LC_MAIN:                        'LC_MAIN',
+    LC_DATA_IN_CODE:                'LC_DATA_IN_CODE',
+    LC_SOURCE_VERSION:              'LC_SOURCE_VERSION',
+    LC_DYLIB_CODE_SIGN_DRS:         'LC_DYLIB_CODE_SIGN_DRS',
+    LC_ENCRYPTION_INFO_64:          'LC_ENCRYPTION_INFO_64',
+    LC_LINKER_OPTION:               'LC_LINKER_OPTION',
+    LC_LINKER_OPTIMIZATION_HINT:    'LC_LINKER_OPTIMIZATION_HINT',
+    LC_VERSION_MIN_TVOS:            'LC_VERSION_MIN_TVOS',
+    LC_VERSION_MIN_WATCHOS:         'LC_VERSION_MIN_WATCHOS',
+}
+
+# Constants for the flags field of the segment_command
+SG_HIGHVM = 0x1
+SG_FVMLIB = 0x2
+SG_NORELOC = 0x4
+SG_PROTECTED_VERSION_1 = 0x8
+
+SEG_PAGEZERO = "__PAGEZERO"
+SEG_TEXT = "__TEXT"
+SECT_TEXT = "__text"
+SECT_FVMLIB_INIT0 = "__fvmlib_init0"
+SECT_FVMLIB_INIT1 = "__fvmlib_init1"
+SEG_DATA = "__DATA"
+SECT_DATA = "__data"
+SECT_BSS = "__bss"
+SECT_COMMON = "__common"
+SEG_OBJC = "__OBJC"
+SECT_OBJC_SYMBOLS = "__symbol_table"
+SECT_OBJC_MODULES = "__module_info"
+SECT_OBJC_STRINGS = "__selector_strs"
+SECT_OBJC_REFS = "__selector_refs"
+SEG_ICON = "__ICON"
+SECT_ICON_HEADER = "__header"
+SECT_ICON_TIFF = "__tiff"
+SEG_LINKEDIT = "__LINKEDIT"
+SEG_UNIXSTACK = "__UNIXSTACK"
+SEG_IMPORT = "__IMPORT"
+
+
+# flags field of a section structure
+SECTION_TYPE = 0xff
+SECTION_ATTRIBUTES = 0xffffff00
+
+# Constants for the type of a section
+S_REGULAR = 0x0
+S_ZEROFILL = 0x1
+S_CSTRING_LITERALS = 0x2
+S_4BYTE_LITERALS = 0x3
+S_8BYTE_LITERALS = 0x4
+S_LITERAL_POINTERS = 0x5
+S_NON_LAZY_SYMBOL_POINTERS = 0x6
+S_LAZY_SYMBOL_POINTERS = 0x7
+S_SYMBOL_STUBS = 0x8
+S_MOD_INIT_FUNC_POINTERS = 0x9
+S_MOD_TERM_FUNC_POINTERS = 0xa
+S_COALESCED = 0xb
+S_GB_ZEROFILL = 0xc
+S_INTERPOSING = 0xd
+S_16BYTE_LITERALS = 0xe
+S_DTRACE_DOF = 0xf
+S_LAZY_DYLIB_SYMBOL_POINTERS = 0x10
+S_THREAD_LOCAL_REGULAR = 0x11
+S_THREAD_LOCAL_ZEROFILL = 0x12
+S_THREAD_LOCAL_VARIABLES = 0x13
+S_THREAD_LOCAL_VARIABLE_POINTERS = 0x14
+S_THREAD_LOCAL_INIT_FUNCTION_POINTERS = 0x15
+
+_FLAG_SECTION_TYPES = {
+    S_REGULAR: "S_REGULAR",
+    S_ZEROFILL: "S_ZEROFILL",
+    S_CSTRING_LITERALS: "S_CSTRING_LITERALS",
+    S_4BYTE_LITERALS: "S_4BYTE_LITERALS",
+    S_8BYTE_LITERALS: "S_8BYTE_LITERALS",
+    S_LITERAL_POINTERS: "S_LITERAL_POINTERS",
+    S_NON_LAZY_SYMBOL_POINTERS: "S_NON_LAZY_SYMBOL_POINTERS",
+    S_LAZY_SYMBOL_POINTERS: "S_LAZY_SYMBOL_POINTERS",
+    S_SYMBOL_STUBS: "S_SYMBOL_STUBS",
+    S_MOD_INIT_FUNC_POINTERS: "S_MOD_INIT_FUNC_POINTERS",
+    S_MOD_TERM_FUNC_POINTERS: "S_MOD_TERM_FUNC_POINTERS",
+    S_COALESCED: "S_COALESCED",
+    S_GB_ZEROFILL: "S_GB_ZEROFILL",
+    S_INTERPOSING: "S_INTERPOSING",
+    S_16BYTE_LITERALS: "S_16BYTE_LITERALS",
+    S_DTRACE_DOF: "S_DTRACE_DOF",
+    S_LAZY_DYLIB_SYMBOL_POINTERS: "S_LAZY_DYLIB_SYMBOL_POINTERS",
+    S_THREAD_LOCAL_REGULAR: "S_THREAD_LOCAL_REGULAR",
+    S_THREAD_LOCAL_ZEROFILL: "S_THREAD_LOCAL_ZEROFILL",
+    S_THREAD_LOCAL_VARIABLES: "S_THREAD_LOCAL_VARIABLES",
+    S_THREAD_LOCAL_VARIABLE_POINTERS: "S_THREAD_LOCAL_VARIABLE_POINTERS",
+    S_THREAD_LOCAL_INIT_FUNCTION_POINTERS: "S_THREAD_LOCAL_INIT_FUNCTION_POINTERS"
+}
+
+# Constants for the section attributes part of the flags field of a section structure.
+SECTION_ATTRIBUTES_USR = 0xff000000
+SECTION_ATTRIBUTES_SYS = 0x00ffff00
+S_ATTR_PURE_INSTRUCTIONS = 0x80000000
+S_ATTR_NO_TOC = 0x40000000
+S_ATTR_STRIP_STATIC_SYMS = 0x20000000
+S_ATTR_NO_DEAD_STRIP = 0x10000000
+S_ATTR_LIVE_SUPPORT = 0x08000000
+S_ATTR_SELF_MODIFYING_CODE = 0x04000000
+S_ATTR_DEBUG = 0x02000000
+S_ATTR_SOME_INSTRUCTIONS = 0x00000400
+S_ATTR_EXT_RELOC = 0x00000200
+S_ATTR_LOC_RELOC = 0x00000100
+
+_FLAG_SECTION_ATTRIBUTES = {
+    S_ATTR_PURE_INSTRUCTIONS: "S_ATTR_PURE_INSTRUCTIONS",
+    S_ATTR_NO_TOC: "S_ATTR_NO_TOC",
+    S_ATTR_STRIP_STATIC_SYMS: "S_ATTR_STRIP_STATIC_SYMS",
+    S_ATTR_NO_DEAD_STRIP: "S_ATTR_NO_DEAD_STRIP",
+    S_ATTR_LIVE_SUPPORT: "S_ATTR_LIVE_SUPPORT",
+    S_ATTR_SELF_MODIFYING_CODE: "S_ATTR_SELF_MODIFYING_CODE",
+    S_ATTR_DEBUG: "S_ATTR_DEBUG",
+    S_ATTR_SOME_INSTRUCTIONS: "S_ATTR_SOME_INSTRUCTIONS",
+    S_ATTR_EXT_RELOC: "S_ATTR_EXT_RELOC",
+    S_ATTR_LOC_RELOC: "S_ATTR_LOC_RELOC"
+}
+
+
+class mach_version_helper(Structure):
+    _fields_ = (
+        ('major', p_ushort),
+        ('minor', p_uint8),
+        ('rev', p_uint8),
+    )
+
+    def __str__(self):
+        return '%s.%s.%s' % (self.major, self.minor, self.rev)
+
+
+class mach_timestamp_helper(p_uint32):
+    def __str__(self):
+        return time.ctime(self)
+
+
+class mach_header(Structure):
+    _fields_ = (
+        ('magic', p_uint32),
+        ('cputype', cpu_type_t),
+        ('cpusubtype', cpu_subtype_t),
+        ('filetype', p_uint32),
+        ('ncmds', p_uint32),
+        ('sizeofcmds', p_uint32),
+        ('flags', p_uint32),
+    )
+
+    def _describe(self):
+        bit = 1
+        flags = self.flags
+        dflags = []
+        while flags and bit < (1 << 32):
+            if flags & bit:
+                dflags.append({
+                    'name': _MH_FLAGS_NAMES.get(bit, str(bit)),
+                    'description': _MH_FLAGS_DESCRIPTIONS.get(bit, str(bit))
+                })
+                flags = flags ^ bit
+            bit <<= 1
+
+        cpu_str, cpusub_str = _CPU_TYPE_TABLE.get((self.cputype, self.cpusubtype), ('unknown', 'unknown'))
+        return (
+            ('magic', int(self.magic)),
+            ('cputype_string', cpu_str),
+            ('cputype', int(self.cputype)),
+            ('cpusubtype_string', cpusub_str),
+            ('cpusubtype', int(self.cpusubtype)),
+            ('filetype_string', _MH_FILETYPE_NAMES.get(self.filetype, self.filetype)),
+            ('filetype', int(self.filetype)),
+            ('ncmds', self.ncmds),
+            ('sizeofcmds', self.sizeofcmds),
+            ('flags', dflags),
+            ('raw_flags', int(self.flags))
+        )
+
+
+class mach_header_64(mach_header):
+    _fields_ = mach_header._fields_ + (('reserved', p_uint32),)
+
+
+class load_command(Structure):
+    _fields_ = (
+        ('cmd', p_uint32),
+        ('cmdsize', p_uint32),
+    )
+
+    def get_cmd_name(self):
+        return _LC_NAMES.get(self.cmd, self.cmd)
+
 
 # this is really a union.. but whatever
 class lc_str(p_uint32):
@@ -471,7 +671,6 @@ class lc_str(p_uint32):
 
 
 p_str16 = pypackable('p_str16', bytes, '16s')
-
 vm_prot_t = p_int32
 
 
@@ -582,12 +781,6 @@ class segment_command_64(Structure):
         return vm
 
 
-SG_HIGHVM = 0x1
-SG_FVMLIB = 0x2
-SG_NORELOC = 0x4
-SG_PROTECTED_VERSION_1 = 0x8
-
-
 class section(Structure):
     _fields_ = (
         ('sectname', p_str16),
@@ -614,11 +807,11 @@ class section(Structure):
         s['reloff'] = int(self.reloff)
         s['nreloc'] = int(self.nreloc)
         f = {}
-        f['type'] = FLAG_SECTION_TYPES[int(self.flags) & 0xff]
+        f['type'] = _FLAG_SECTION_TYPES[int(self.flags) & SECTION_TYPE]
         f['attributes'] = []
-        for k in FLAG_SECTION_ATTRIBUTES:
+        for k in _FLAG_SECTION_ATTRIBUTES:
             if k & self.flags:
-                f['attributes'].append(FLAG_SECTION_ATTRIBUTES[k])
+                f['attributes'].append(_FLAG_SECTION_ATTRIBUTES[k])
         if not f['attributes']:
             del f['attributes']
         s['flags'] = f
@@ -657,11 +850,11 @@ class section_64(Structure):
         s['reloff'] = int(self.reloff)
         s['nreloc'] = int(self.nreloc)
         f = {}
-        f['type'] = FLAG_SECTION_TYPES[int(self.flags) & 0xff]
+        f['type'] = _FLAG_SECTION_TYPES[int(self.flags) & SECTION_TYPE]
         f['attributes'] = []
-        for k in FLAG_SECTION_ATTRIBUTES:
+        for k in _FLAG_SECTION_ATTRIBUTES:
             if k & self.flags:
-                f['attributes'].append(FLAG_SECTION_ATTRIBUTES[k])
+                f['attributes'].append(_FLAG_SECTION_ATTRIBUTES[k])
         if not f['attributes']:
             del f['attributes']
         s['flags'] = f
@@ -673,105 +866,6 @@ class section_64(Structure):
     def add_section_data(self, data):
         self.section_data = data
 
-
-SECTION_TYPE = 0xff
-SECTION_ATTRIBUTES = 0xffffff00
-S_REGULAR = 0x0
-S_ZEROFILL = 0x1
-S_CSTRING_LITERALS = 0x2
-S_4BYTE_LITERALS = 0x3
-S_8BYTE_LITERALS = 0x4
-S_LITERAL_POINTERS = 0x5
-S_NON_LAZY_SYMBOL_POINTERS = 0x6
-S_LAZY_SYMBOL_POINTERS = 0x7
-S_SYMBOL_STUBS = 0x8
-S_MOD_INIT_FUNC_POINTERS = 0x9
-S_MOD_TERM_FUNC_POINTERS = 0xa
-S_COALESCED = 0xb
-S_GB_ZEROFILL = 0xc
-S_INTERPOSING = 0xd
-S_16BYTE_LITERALS = 0xe
-S_DTRACE_DOF = 0xf
-S_LAZY_DYLIB_SYMBOL_POINTERS = 0x10
-S_THREAD_LOCAL_REGULAR = 0x11
-S_THREAD_LOCAL_ZEROFILL = 0x12
-S_THREAD_LOCAL_VARIABLES = 0x13
-S_THREAD_LOCAL_VARIABLE_POINTERS = 0x14
-S_THREAD_LOCAL_INIT_FUNCTION_POINTERS = 0x15
-
-FLAG_SECTION_TYPES = {
-    0x0: "S_REGULAR",
-    0x1: "S_ZEROFILL",
-    0x2: "S_CSTRING_LITERALS",
-    0x3: "S_4BYTE_LITERALS",
-    0x4: "S_8BYTE_LITERALS",
-    0x5: "S_LITERAL_POINTERS",
-    0x6: "S_NON_LAZY_SYMBOL_POINTERS",
-    0x7: "S_LAZY_SYMBOL_POINTERS",
-    0x8: "S_SYMBOL_STUBS",
-    0x9: "S_MOD_INIT_FUNC_POINTERS",
-    0xa: "S_MOD_TERM_FUNC_POINTERS",
-    0xb: "S_COALESCED",
-    0xc: "S_GB_ZEROFILL",
-    0xd: "S_INTERPOSING",
-    0xe: "S_16BYTE_LITERALS",
-    0xf: "S_DTRACE_DOF",
-    0x10: "S_LAZY_DYLIB_SYMBOL_POINTERS",
-    0x11: "S_THREAD_LOCAL_REGULAR",
-    0x12: "S_THREAD_LOCAL_ZEROFILL",
-    0x13: "S_THREAD_LOCAL_VARIABLES",
-    0x14: "S_THREAD_LOCAL_VARIABLE_POINTERS",
-    0x15: "S_THREAD_LOCAL_INIT_FUNCTION_POINTERS"
-}
-
-
-FLAG_SECTION_ATTRIBUTES = {
-    0x80000000: "S_ATTR_PURE_INSTRUCTIONS",
-    0x40000000: "S_ATTR_NO_TOC",
-    0x20000000: "S_ATTR_STRIP_STATIC_SYMS",
-    0x10000000: "S_ATTR_NO_DEAD_STRIP",
-    0x08000000: "S_ATTR_LIVE_SUPPORT",
-    0x04000000: "S_ATTR_SELF_MODIFYING_CODE",
-    0x02000000: "S_ATTR_DEBUG",
-    0x00000400: "S_ATTR_SOME_INSTRUCTIONS",
-    0x00000200: "S_ATTR_EXT_RELOC",
-    0x00000100: "S_ATTR_LOC_RELOC"
-}
-
-SECTION_ATTRIBUTES_USR = 0xff000000
-S_ATTR_PURE_INSTRUCTIONS = 0x80000000
-S_ATTR_NO_TOC = 0x40000000
-S_ATTR_STRIP_STATIC_SYMS = 0x20000000
-S_ATTR_NO_DEAD_STRIP = 0x10000000
-S_ATTR_LIVE_SUPPORT = 0x08000000
-S_ATTR_SELF_MODIFYING_CODE = 0x04000000
-S_ATTR_DEBUG = 0x02000000
-SECTION_ATTRIBUTES_SYS = 0x00ffff00
-S_ATTR_SOME_INSTRUCTIONS = 0x00000400
-S_ATTR_EXT_RELOC = 0x00000200
-S_ATTR_LOC_RELOC = 0x00000100
-
-
-SEG_PAGEZERO = "__PAGEZERO"
-SEG_TEXT = "__TEXT"
-SECT_TEXT = "__text"
-SECT_FVMLIB_INIT0 = "__fvmlib_init0"
-SECT_FVMLIB_INIT1 = "__fvmlib_init1"
-SEG_DATA = "__DATA"
-SECT_DATA = "__data"
-SECT_BSS = "__bss"
-SECT_COMMON = "__common"
-SEG_OBJC = "__OBJC"
-SECT_OBJC_SYMBOLS = "__symbol_table"
-SECT_OBJC_MODULES = "__module_info"
-SECT_OBJC_STRINGS = "__selector_strs"
-SECT_OBJC_REFS = "__selector_refs"
-SEG_ICON = "__ICON"
-SECT_ICON_HEADER = "__header"
-SECT_ICON_TIFF = "__tiff"
-SEG_LINKEDIT = "__LINKEDIT"
-SEG_UNIXSTACK = "__UNIXSTACK"
-SEG_IMPORT = "__IMPORT"
 
 #
 #  I really should remove all these _command classes because they
@@ -1267,109 +1361,60 @@ class linker_option_command (Structure):
 
 
 LC_REGISTRY = {
-    LC_SEGMENT:         segment_command,
-    LC_IDFVMLIB:        fvmlib_command,
-    LC_LOADFVMLIB:      fvmlib_command,
-    LC_ID_DYLIB:        dylib_command,
-    LC_LOAD_DYLIB:      dylib_command,
+    LC_SEGMENT: segment_command,
+    LC_IDFVMLIB: fvmlib_command,
+    LC_LOADFVMLIB: fvmlib_command,
+    LC_ID_DYLIB: dylib_command,
+    LC_LOAD_DYLIB: dylib_command,
     LC_LOAD_WEAK_DYLIB: dylib_command,
-    LC_SUB_FRAMEWORK:   sub_framework_command,
-    LC_SUB_CLIENT:      sub_client_command,
-    LC_SUB_UMBRELLA:    sub_umbrella_command,
-    LC_SUB_LIBRARY:     sub_library_command,
-    LC_PREBOUND_DYLIB:  prebound_dylib_command,
-    LC_ID_DYLINKER:     dylinker_command,
-    LC_LOAD_DYLINKER:   dylinker_command,
-    LC_THREAD:          thread_command,
-    LC_UNIXTHREAD:      thread_command,
-    LC_ROUTINES:        routines_command,
-    LC_SYMTAB:          symtab_command,
-    LC_DYSYMTAB:        dysymtab_command,
-    LC_TWOLEVEL_HINTS:  twolevel_hints_command,
-    LC_PREBIND_CKSUM:   prebind_cksum_command,
-    LC_SYMSEG:          symseg_command,
-    LC_IDENT:           ident_command,
-    LC_FVMFILE:         fvmfile_command,
-    LC_SEGMENT_64:      segment_command_64,
-    LC_ROUTINES_64:     routines_command_64,
-    LC_UUID:            uuid_command,
-    LC_RPATH:           rpath_command,
-    LC_CODE_SIGNATURE:  linkedit_data_command,
-    LC_CODE_SEGMENT_SPLIT_INFO:  linkedit_data_command,
-    LC_REEXPORT_DYLIB:  dylib_command,
+    LC_SUB_FRAMEWORK: sub_framework_command,
+    LC_SUB_CLIENT: sub_client_command,
+    LC_SUB_UMBRELLA: sub_umbrella_command,
+    LC_SUB_LIBRARY: sub_library_command,
+    LC_PREBOUND_DYLIB: prebound_dylib_command,
+    LC_ID_DYLINKER: dylinker_command,
+    LC_LOAD_DYLINKER: dylinker_command,
+    LC_THREAD: thread_command,
+    LC_UNIXTHREAD: thread_command,
+    LC_ROUTINES: routines_command,
+    LC_SYMTAB: symtab_command,
+    LC_DYSYMTAB: dysymtab_command,
+    LC_TWOLEVEL_HINTS: twolevel_hints_command,
+    LC_PREBIND_CKSUM: prebind_cksum_command,
+    LC_SYMSEG: symseg_command,
+    LC_IDENT: ident_command,
+    LC_FVMFILE: fvmfile_command,
+    LC_SEGMENT_64: segment_command_64,
+    LC_ROUTINES_64: routines_command_64,
+    LC_UUID: uuid_command,
+    LC_RPATH: rpath_command,
+    LC_CODE_SIGNATURE: linkedit_data_command,
+    LC_CODE_SEGMENT_SPLIT_INFO: linkedit_data_command,
+    LC_REEXPORT_DYLIB: dylib_command,
     LC_LAZY_LOAD_DYLIB: dylib_command,
     LC_ENCRYPTION_INFO: encryption_info_command,
-    LC_DYLD_INFO:       dyld_info_command,
-    LC_DYLD_INFO_ONLY:  dyld_info_command,
+    LC_DYLD_INFO: dyld_info_command,
+    LC_DYLD_INFO_ONLY: dyld_info_command,
     LC_LOAD_UPWARD_DYLIB: dylib_command,
     LC_VERSION_MIN_MACOSX: version_min_command,
     LC_VERSION_MIN_IPHONEOS: version_min_command,
-    LC_FUNCTION_STARTS:  linkedit_data_command,
+    LC_FUNCTION_STARTS: linkedit_data_command,
     LC_DYLD_ENVIRONMENT: dylinker_command,
-    LC_MAIN:        entry_point_command,
-    LC_DATA_IN_CODE:    linkedit_data_command,
-    LC_SOURCE_VERSION:  source_version_command,
-    LC_DYLIB_CODE_SIGN_DRS:  linkedit_data_command,
+    LC_MAIN: entry_point_command,
+    LC_DATA_IN_CODE: linkedit_data_command,
+    LC_SOURCE_VERSION: source_version_command,
+    LC_DYLIB_CODE_SIGN_DRS: linkedit_data_command,
     LC_ENCRYPTION_INFO_64: encryption_info_command_64,
-    LC_LINKER_OPTION:  linker_option_command,
+    LC_LINKER_OPTION: linker_option_command,
     LC_LINKER_OPTIMIZATION_HINT: linkedit_data_command,
     LC_VERSION_MIN_TVOS: version_min_command,
     LC_VERSION_MIN_WATCHOS: version_min_command,
 }
 
-LC_NAMES = {
-    LC_SEGMENT:                     'LC_SEGMENT',
-    LC_IDFVMLIB:                    'LC_IDFVMLIB',
-    LC_LOADFVMLIB:                  'LC_LOADFVMLIB',
-    LC_ID_DYLIB:                    'LC_ID_DYLIB',
-    LC_LOAD_DYLIB:                  'LC_LOAD_DYLIB',
-    LC_LOAD_WEAK_DYLIB:             'LC_LOAD_WEAK_DYLIB',
-    LC_SUB_FRAMEWORK:               'LC_SUB_FRAMEWORK',
-    LC_SUB_CLIENT:                  'LC_SUB_CLIENT',
-    LC_SUB_UMBRELLA:                'LC_SUB_UMBRELLA',
-    LC_SUB_LIBRARY:                 'LC_SUB_LIBRARY',
-    LC_PREBOUND_DYLIB:              'LC_PREBOUND_DYLIB',
-    LC_ID_DYLINKER:                 'LC_ID_DYLINKER',
-    LC_LOAD_DYLINKER:               'LC_LOAD_DYLINKER',
-    LC_THREAD:                      'LC_THREAD',
-    LC_UNIXTHREAD:                  'LC_UNIXTHREAD',
-    LC_ROUTINES:                    'LC_ROUTINES',
-    LC_SYMTAB:                      'LC_SYMTAB',
-    LC_DYSYMTAB:                    'LC_DYSYMTAB',
-    LC_TWOLEVEL_HINTS:              'LC_TWOLEVEL_HINTS',
-    LC_PREBIND_CKSUM:               'LC_PREBIND_CKSUM',
-    LC_SYMSEG:                      'LC_SYMSEG',
-    LC_IDENT:                       'LC_IDENT',
-    LC_FVMFILE:                     'LC_FVMFILE',
-    LC_SEGMENT_64:                  'LC_SEGMENT_64',
-    LC_ROUTINES_64:                 'LC_ROUTINES_64',
-    LC_UUID:                        'LC_UUID',
-    LC_RPATH:                       'LC_RPATH',
-    LC_CODE_SIGNATURE:              'LC_CODE_SIGNATURE',
-    LC_CODE_SEGMENT_SPLIT_INFO:     'LC_CODE_SEGMENT_SPLIT_INFO',
-    LC_REEXPORT_DYLIB:              'LC_REEXPORT_DYLIB',
-    LC_LAZY_LOAD_DYLIB:             'LC_LAZY_LOAD_DYLIB',
-    LC_ENCRYPTION_INFO:             'LC_ENCRYPTION_INFO',
-    LC_DYLD_INFO:                   'LC_DYLD_INFO',
-    LC_DYLD_INFO_ONLY:              'LC_DYLD_INFO_ONLY',
-    LC_LOAD_UPWARD_DYLIB:           'LC_LOAD_UPWARD_DYLIB',
-    LC_VERSION_MIN_MACOSX:          'LC_VERSION_MIN_MACOSX',
-    LC_VERSION_MIN_IPHONEOS:        'LC_VERSION_MIN_IPHONEOS',
-    LC_FUNCTION_STARTS:             'LC_FUNCTION_STARTS',
-    LC_DYLD_ENVIRONMENT:            'LC_DYLD_ENVIRONMENT',
-    LC_MAIN:                        'LC_MAIN',
-    LC_DATA_IN_CODE:                'LC_DATA_IN_CODE',
-    LC_SOURCE_VERSION:              'LC_SOURCE_VERSION',
-    LC_DYLIB_CODE_SIGN_DRS:         'LC_DYLIB_CODE_SIGN_DRS',
-    LC_ENCRYPTION_INFO_64:          'LC_ENCRYPTION_INFO_64',
-    LC_LINKER_OPTION:               'LC_LINKER_OPTION',
-    LC_LINKER_OPTIMIZATION_HINT:    'LC_LINKER_OPTIMIZATION_HINT',
-    LC_VERSION_MIN_TVOS:            'LC_VERSION_MIN_TVOS',
-    LC_VERSION_MIN_WATCHOS:         'LC_VERSION_MIN_WATCHOS',
-}
 
+## Symbol table nlist.h
 
-# this is another union.
+# an union
 class n_un(p_int32):
     pass
 
@@ -1393,20 +1438,23 @@ class nlist_64(Structure):
         ('n_value', p_int64),
     ]
 
-N_STAB = 0xe0
-N_PEXT = 0x10
-N_TYPE = 0x0e
-N_EXT = 0x01
+# four fields in the n_type
+N_STAB = 0xe0  # if any of these bits set, a symbolic debugging entry
+N_PEXT = 0x10  # private external symbol bit
+N_TYPE = 0x0e  # mask for the type bits
+N_EXT = 0x01  # external symbol bit, set for external symbols
 
-N_UNDF = 0x0
-N_ABS = 0x2
-N_SECT = 0xe
-N_PBUD = 0xc
-N_INDR = 0xa
+# Values for N_TYPE bits of the n_type field.
+N_UNDF = 0x0  # undefined, n_sect == NO_SECT
+N_ABS = 0x2  # absolute, n_sect == NO_SECT
+N_SECT = 0xe  # defined in section number n_sect
+N_PBUD = 0xc  # prebound undefined (defined in a dylib)
+N_INDR = 0xa  # indirect
 
-NO_SECT = 0
-MAX_SECT = 255
+NO_SECT = 0  # symbol is not in any section
+MAX_SECT = 255  # 1 thru 255 inclusive
 
+# Reference type bits of the n_desc field of undefined symbols
 REFERENCE_TYPE = 0xf
 REFERENCE_FLAG_UNDEFINED_NON_LAZY = 0
 REFERENCE_FLAG_UNDEFINED_LAZY = 1
@@ -1434,8 +1482,10 @@ N_DESC_DISCARDED = 0x0020
 N_WEAK_REF = 0x0040
 N_WEAK_DEF = 0x0080
 
-# /usr/include/mach-o/fat.h
+
+## FAT header
 FAT_MAGIC = 0xcafebabe
+FAT_CIGAM = 0xbebafeca
 
 
 class fat_header(Structure):
